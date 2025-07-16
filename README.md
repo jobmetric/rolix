@@ -1,6 +1,7 @@
 # Rolix
 
-A secure and intuitive `currency` exchange platform designed to `facilitate` seamless transactions and promote peace of mind in financial exchanges.
+An advanced role, membership, and delegation system for Laravel — built for large-scale, multi-tenant, and modular applications.
+It provides a robust solution for managing roles, permissions, and user memberships, allowing for flexible delegation of responsibilities across various modules.
 
 ## Install via composer
 
