@@ -1,0 +1,64 @@
+{
+    "name": "jobmetric/rolix",
+    "description": "An advanced role, membership, and delegation system for Laravel — built for large-scale, multi-tenant, and modular applications. It provides a robust solution for managing roles, permissions, and user memberships, allowing for flexible delegation of responsibilities across various modules.",
+    "type": "library",
+    "license": "MIT",
+    "keywords": [
+        "laravel",
+        "jobmetric",
+        "package",
+        "rolix",
+        "roll",
+        "permission",
+        "membership",
+        "representative",
+        "delegation",
+        "large-scale",
+        "access control"
+    ],
+    "homepage": "https://doc.jobmetric.net/package/rolix",
+    "authors": [
+        {
+            "name": "Majid Mohammadian",
+            "email": "majeedmohammadian@gmail.com",
+            "homepage": "https://www.linkedin.com/in/majidmohammadian/",
+            "role": "Full Stack Developer"
+        }
+    ],
+    "require": {
+        "php": ">=8.0.1",
+        "ext-json": "*",
+        "laravel/framework": ">=9.19",
+        "jobmetric/laravel-package-core": "^1.19.4"
+    },
+    "autoload": {
+        "files": [
+            "src/helpers.php"
+        ],
+        "psr-4": {
+            "JobMetric\\Rolix\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "JobMetric\\Rolix\\RolixServiceProvider"
+            ],
+            "aliases": {
+                "Pax": "JobMetric\\Rolix\\Facades\\Rolix"
+            }
+        }
+    },
+    "minimum-stability": "stable",
+    "support": {
+        "issues": "https://github.com/jobmetric/rolix/issues",
+        "forum": "https://twitter.com/jobmetric",
+        "source": "https://github.com/jobmetric/rolix"
+    },
+    "funding": [
+        {
+            "type": "github",
+            "url": "https://github.com/sponsors/majidmohammadian"
+        }
+    ]
+}
