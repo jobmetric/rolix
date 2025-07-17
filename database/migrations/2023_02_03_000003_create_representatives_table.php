@@ -18,6 +18,7 @@ return new class extends Migration {
             $table->id();
 
             $table->foreignId('from_membership_id')
+                ->index()
                 ->constrained(config('rolix.tables.membership'))
                 ->cascadeOnDelete();
             /**
@@ -30,6 +31,7 @@ return new class extends Migration {
              */
 
             $table->foreignId('role_id')
+                ->index()
                 ->constrained(config('rolix.tables.role'))
                 ->cascadeOnDelete();
             /**
@@ -42,17 +44,17 @@ return new class extends Migration {
              * For example: tenant, team, project, etc.
              */
 
-            $table->text('reason')->nullable();
+            $table->text('reason')->nullable()->index();
             /**
              * Optional explanation for why the delegation was made.
              */
 
-            $table->dateTime('started_at')->nullable();
+            $table->dateTime('started_at')->nullable()->index();
             /**
              * When the delegation starts. If null, activation date may be used instead.
              */
 
-            $table->dateTime('expired_at')->nullable();
+            $table->dateTime('expired_at')->nullable()->index();
             /**
              * When the delegation ends and becomes inactive.
              */
@@ -62,12 +64,12 @@ return new class extends Migration {
              * Token for verifying and activating the delegation by the recipient.
              */
 
-            $table->dateTime('activation_expires_at')->nullable();
+            $table->dateTime('activation_expires_at')->nullable()->index();
             /**
              * The expiration time of the activation token.
              */
 
-            $table->dateTime('activated_at')->nullable();
+            $table->dateTime('activated_at')->nullable()->index();
             /**
              * When the recipient accepted and activated the delegation.
              */
@@ -81,18 +83,18 @@ return new class extends Migration {
              * Uses: RepresentativeStatusEnum
              */
 
-            $table->dateTime('active_at')->nullable();
+            $table->dateTime('active_at')->nullable()->index();
             /**
              * Timestamp of when the delegation officially became active.
              */
 
-            $table->dateTime('cancel_at')->nullable();
+            $table->dateTime('cancel_at')->nullable()->index();
             $table->morphs('cancel_by');
             /**
              * When and by whom the delegation was canceled.
              */
 
-            $table->dateTime('reject_at')->nullable();
+            $table->dateTime('reject_at')->nullable()->index();
             $table->morphs('reject_by');
             /**
              * When and by whom the delegation was rejected.

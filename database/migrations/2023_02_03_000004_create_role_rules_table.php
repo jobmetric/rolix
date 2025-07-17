@@ -17,6 +17,7 @@ return new class extends Migration {
             $table->id();
 
             $table->foreignId('role_id')
+                ->index()
                 ->constrained(config('rolix.tables.role'))
                 ->cascadeOnDelete();
             /**

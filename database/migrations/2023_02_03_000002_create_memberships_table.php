@@ -32,11 +32,18 @@ return new class extends Migration {
 
             $table->foreignId('role_id')
                 ->nullable()
+                ->index()
                 ->constrained(config('rolix.tables.role'))
                 ->nullOnDelete();
             /**
              * The assigned role ID for this membership.
              * If null, it means the person is a member without a defined role.
+             */
+
+            $table->string('collection')->nullable()->index();
+            /**
+             * for another collection file
+             * if null, value for base collection
              */
 
             $table->boolean('is_owner')->default(false);
@@ -45,7 +52,7 @@ return new class extends Migration {
              * Used for special privileges or full access.
              */
 
-            $table->timestamp('expired_at')->nullable();
+            $table->timestamp('expired_at')->nullable()->index();
             /**
              * If set, the membership will be considered expired after this timestamp.
              */
@@ -64,6 +71,15 @@ return new class extends Migration {
 
             $table->softDeletes();
             $table->timestamps();
+
+            $table->unique([
+                'personable_type',
+                'personable_id',
+                'memberable_type',
+                'memberable_id',
+                'role_id',
+                'collection'
+            ], 'MEMBERSHIP_UNIQUE');
         });
     }
 

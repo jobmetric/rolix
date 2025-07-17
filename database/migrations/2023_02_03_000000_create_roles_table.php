@@ -17,7 +17,7 @@ return new class extends Migration {
         Schema::create(config('rolix.tables.role'), function (Blueprint $table) {
             $table->id();
 
-            $table->string('type')->nullable();
+            $table->string('type')->nullable()->index();
             /**
              * The context or scope this role belongs to.
              * Examples: 'administrator', 'tenant.1', 'team.2'
@@ -26,6 +26,7 @@ return new class extends Migration {
 
             $table->foreignId('parent_id')
                 ->nullable()
+                ->index()
                 ->constrained(config('rolix.tables.role'))
                 ->nullOnDelete();
             /**
@@ -33,7 +34,7 @@ return new class extends Migration {
              * Enables inheritance or grouping of roles under a parent.
              */
 
-            $table->string('name');
+            $table->string('name')->index();
             /**
              * Human-readable name for the role.
              * Examples: 'Admin', 'Manager', 'Content Moderator'
@@ -62,7 +63,7 @@ return new class extends Migration {
              * Only one default role should exist per type/category.
              */
 
-            $table->unsignedInteger('ordering')->default(0);
+            $table->unsignedInteger('ordering')->default(0)->index();
             /**
              * Determines the display or evaluation order of roles.
              * Lower numbers appear earlier in listings or evaluations.

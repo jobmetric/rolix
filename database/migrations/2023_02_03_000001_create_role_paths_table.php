@@ -37,7 +37,7 @@ return new class extends Migration {
              * The path_id refers to one of the parent or ancestor roles of the current role.
              */
 
-            $table->unsignedInteger('level')->default(0);
+            $table->unsignedInteger('level')->default(0)->index();
             /**
              * Indicates the distance (depth) between the current role and the ancestor.
              * Root level is 0; immediate parent is 1; grandparent is 2, and so on.

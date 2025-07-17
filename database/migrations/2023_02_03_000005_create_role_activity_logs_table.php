@@ -16,7 +16,7 @@ return new class extends Migration {
         Schema::create(config('rolix.tables.role_activity_log'), function (Blueprint $table) {
             $table->id();
 
-            $table->string('action');
+            $table->string('action')->index();
             /**
              * The type of action performed.
              * Examples: assign_role, remove_role, delegate_role, revoke_delegate, reject_delegate, etc.
@@ -45,22 +45,22 @@ return new class extends Migration {
              * For example: a Role, a Membership, or a Representative.
              */
 
-            $table->text('reason')->nullable();
+            $table->text('reason')->nullable()->index();
             /**
              * Optional description or explanation for why the action was taken.
              */
 
-            $table->ipAddress()->nullable();
+            $table->ipAddress()->nullable()->index();
             /**
              * IP address of the actor at the time of action.
              */
 
-            $table->text('user_agent')->nullable();
+            $table->text('user_agent')->nullable()->index();
             /**
              * User agent string for the actor’s client (browser, app, etc.).
              */
 
-            $table->dateTime('performed_at')->nullable();
+            $table->dateTime('performed_at')->nullable()->index();
             /**
              * The actual timestamp when the action was performed.
              * Useful for backdated logs or imported audit trails.
