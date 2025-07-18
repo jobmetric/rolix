@@ -3,6 +3,9 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use JobMetric\Rolix\Enums\RepresentativeCancelActorEnum;
+use JobMetric\Rolix\Enums\RepresentativeCancelReasonEnum;
+use JobMetric\Rolix\Enums\RepresentativeRejectReasonEnum;
 use JobMetric\Rolix\Enums\RepresentativeStatusEnum;
 
 return new class extends Migration {
@@ -79,8 +82,14 @@ return new class extends Migration {
                 ->index();
             /**
              * The current status of the delegation.
-             * Possible values: pending, active, cancel, reject, expire.
-             * Uses: RepresentativeStatusEnum
+             * Possible values:
+             *      pending
+             *      active
+             *      cancel
+             *      reject
+             *      expire
+             *
+             * @see RepresentativeStatusEnum
              */
 
             $table->dateTime('active_at')->nullable()->index();
@@ -89,20 +98,67 @@ return new class extends Migration {
              */
 
             $table->dateTime('cancel_at')->nullable()->index();
-            $table->morphs('cancel_by');
+            $table->nullableMorphs('cancel_by');
             /**
              * When and by whom the delegation was canceled.
              */
 
+            $table->string('cancel_actor')->nullable()->index();
+            /**
+             * The actor who performed the cancellation.
+             * Possible values:
+             *      user
+             *      admin
+             *      system
+             *      third_party
+             *
+             * @see RepresentativeCancelActorEnum
+             */
+
+            $table->string('cancel_reason')->nullable()->index();
+            /**
+             * The reason for the cancellation.
+             * Possible values:
+             *      user_request
+             *      payment_failed
+             *      quota_exceeded
+             *      policy_violation
+             *      expired
+             *      duplicate
+             *      replaced
+             *
+             * @see RepresentativeCancelReasonEnum
+             */
+
             $table->dateTime('reject_at')->nullable()->index();
-            $table->morphs('reject_by');
+            $table->nullableMorphs('reject_by');
             /**
              * When and by whom the delegation was rejected.
+             */
+
+            $table->string('reject_reason')->nullable()->index();
+            /**
+             * The reason for the rejection.
+             * Possible values:
+             *      invalid_data
+             *      insufficient_permissions
+             *      role_not_found
+             *      already_exists
+             *      unauthorized
+             *      policy_violation
+             *      incomplete_documents
+             *      fraud_suspected
+             *      manual_review_failed
+             *      auto_validation_failed
+             *      other
+             *
+             * @see RepresentativeRejectReasonEnum
              */
 
             $table->timestamps();
         });
     }
+
 
     /**
      * Reverse the migrations.
