@@ -8,8 +8,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
-use JobMetric\Membership\Events\MemberableResourceEvent;
-use JobMetric\Rolix\Events\PersonableResourceEvent;
+use JobMetric\Rolix\Events\Resources\MemberableResourceEvent;
+use JobMetric\Rolix\Events\Resources\PersonableResourceEvent;
 
 /**
  * JobMetric\Rolix\Models\Membership
