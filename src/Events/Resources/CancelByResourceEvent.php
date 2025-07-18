@@ -1,15 +1,15 @@
 <?php
 
-namespace JobMetric\Rolix\Events;
+namespace JobMetric\Rolix\Events\Resources;
 
-class MemberableResourceEvent
+class CancelByResourceEvent
 {
     /**
-     * The memberable model instance.
+     * The cancel_by model instance.
      *
      * @var mixed
      */
-    public mixed $memberable;
+    public mixed $cancel_by;
 
     /**
      * The resource to be filled by the listener.
@@ -21,11 +21,11 @@ class MemberableResourceEvent
     /**
      * Create a new event instance.
      *
-     * @param mixed $memberable
+     * @param mixed $cancel_by
      */
-    public function __construct(mixed $memberable)
+    public function __construct(mixed $cancel_by)
     {
-        $this->memberable = $memberable;
+        $this->cancel_by = $cancel_by;
         $this->resource = null;
     }
 }

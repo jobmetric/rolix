@@ -1,15 +1,15 @@
 <?php
 
-namespace JobMetric\Rolix\Events;
+namespace JobMetric\Rolix\Events\Resources;
 
-class PersonableResourceEvent
+class ContextResourceEvent
 {
     /**
-     * The personable model instance.
+     * The context model instance.
      *
      * @var mixed
      */
-    public mixed $personable;
+    public mixed $context;
 
     /**
      * The resource to be filled by the listener.
@@ -21,11 +21,11 @@ class PersonableResourceEvent
     /**
      * Create a new event instance.
      *
-     * @param mixed $personable
+     * @param mixed $context
      */
-    public function __construct(mixed $personable)
+    public function __construct(mixed $context)
     {
-        $this->personable = $personable;
+        $this->context = $context;
         $this->resource = null;
     }
 }
