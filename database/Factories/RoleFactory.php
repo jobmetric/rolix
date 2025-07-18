@@ -1,6 +1,6 @@
 <?php
 
-namespace Factories;
+namespace JobMetric\Rolix\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 use JobMetric\Rolix\Models\Role;
