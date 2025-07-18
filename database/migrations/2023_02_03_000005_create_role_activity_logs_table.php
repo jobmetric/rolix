@@ -60,7 +60,7 @@ return new class extends Migration {
              * User agent string for the actor’s client (browser, app, etc.).
              */
 
-            $table->dateTime('performed_at')->nullable()->index();
+            $table->dateTime('performed_at')->index();
             /**
              * The actual timestamp when the action was performed.
              * Useful for backdated logs or imported audit trails.
