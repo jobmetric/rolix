@@ -62,7 +62,7 @@ return new class extends Migration {
              * When the delegation ends and becomes inactive.
              */
 
-            $table->string('activation_token')->nullable()->unique();
+            $table->uuid('activation_token')->nullable()->unique();
             /**
              * Token for verifying and activating the delegation by the recipient.
              */
