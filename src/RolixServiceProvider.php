@@ -2,9 +2,14 @@
 
 namespace JobMetric\Rolix;
 
+use JobMetric\PackageCore\Enums\RegisterClassTypeEnum;
 use JobMetric\PackageCore\Exceptions\MigrationFolderNotFoundException;
+use JobMetric\PackageCore\Exceptions\RegisterClassTypeNotFoundException;
 use JobMetric\PackageCore\PackageCore;
 use JobMetric\PackageCore\PackageCoreServiceProvider;
+use JobMetric\Rolix\Events\RegisterPathPermissionEvent;
+use JobMetric\Rolix\Facades\Permission;
+use JobMetric\Rolix\Services\PermissionManager;
 
 class RolixServiceProvider extends PackageCoreServiceProvider
 {
@@ -13,12 +18,43 @@ class RolixServiceProvider extends PackageCoreServiceProvider
      *
      * @return void
      * @throws MigrationFolderNotFoundException
+     * @throws RegisterClassTypeNotFoundException
      */
     public function configuration(PackageCore $package): void
     {
         $package->name('rolix')
             ->hasConfig()
             ->hasMigration()
-            ->hasTranslation();
+            ->hasTranslation()
+            ->registerClass('rolix.permission', PermissionManager::class, RegisterClassTypeEnum::SINGLETON());
+    }
+
+    /**
+     * after boot package
+     *
+     * @return void
+     */
+    public function afterBootPackage(): void
+    {
+        app()->booted(function () {
+            $global_permission_path = config_path('permissions');
+
+            $paths = glob($global_permission_path . DIRECTORY_SEPARATOR . '*.php');
+
+            foreach ($paths as $path) {
+                $context = basename($path, '.php');
+
+                Permission::addPermissionFile($context, $path);
+            }
+
+            $event = new RegisterPathPermissionEvent;
+            event($event);
+
+            if (!empty($event->getPaths())) {
+                foreach ($event->getPaths() as $context => $path) {
+                    Permission::addPermissionFile($context, $path);
+                }
+            }
+        });
     }
 }
