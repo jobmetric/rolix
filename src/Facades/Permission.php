@@ -9,11 +9,13 @@ use JobMetric\Rolix\Services\PermissionManager;
  * @mixin PermissionManager
  *
  * @method static void addPermissionFile(string $context, string $path)
- * @method static array getPermissions(string $context)
- * @method static array getAllPermissions()
+ * @method static array getPermissions(string $context = null, string $view = 'assoc')
  * @method static bool hasPermission(string $context, string $permission)
- * @method static void clearPermissions()
- * @method static array getContextsWithPermissions()
+ * @method static array getContextPermission()
+ * @method static array getFlatPermissions(string $context = null)
+ * @method static array getLangPermissions(string $context = null)
+ * @method static array getFlatLangPermissions(string $context = null)
+ * @method static array getAssocPermissions(string $context = null)
  */
 class Permission extends Facade
 {

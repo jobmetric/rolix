@@ -26,7 +26,7 @@ class PermissionManager
                 foreach ($permissions as $permission => $permission_lang) {
                     if (is_string($permission) && is_string($permission_lang)) {
                         $this->permissions[$context][] = [
-                            'permission' => $permission,
+                            'perm' => $permission,
                             'lang' => $permission_lang
                         ];
                     } else {
@@ -44,34 +44,19 @@ class PermissionManager
     /**
      * Get all permissions for a specific context
      *
-     * @param string $context
+     * @param string|null $context
+     * @param string $view
      *
      * @return array
      */
-    public function getPermissions(string $context): array
+    public function getPermissions(string $context = null, string $view = 'assoc'): array
     {
-        return $this->permissions[$context] ?? [];
-    }
-
-    /**
-     * Get all permissions across all contexts
-     *
-     * @return array
-     */
-    public function getAllPermissions(): array
-    {
-        $allPermissions = [];
-        foreach ($this->permissions as $context => $permissions) {
-            foreach ($permissions as $permission) {
-                $allPermissions[] = [
-                    'context' => $context,
-                    'permission' => $permission['permission'],
-                    'lang' => $permission['lang']
-                ];
-            }
-        }
-
-        return $allPermissions;
+        return match ($view) {
+            'flat' => $this->getFlatPermissions($context),
+            'lang' => $this->getLangPermissions($context),
+            'flat_lang' => $this->getFlatLangPermissions($context),
+            default => $this->getAssocPermissions($context),
+        };
     }
 
     /**
@@ -86,7 +71,7 @@ class PermissionManager
     {
         if (isset($this->permissions[$context])) {
             foreach ($this->permissions[$context] as $perm) {
-                if ($perm['permission'] === $permission) {
+                if ($perm['perm'] === $permission) {
                     return true;
                 }
             }
@@ -96,29 +81,96 @@ class PermissionManager
     }
 
     /**
-     * Clear all permissions
-     *
-     * @return void
-     */
-    public function clearPermissions(): void
-    {
-        $this->permissions = [];
-    }
-
-    /**
-     * Get all contexts with their permissions
+     * Get all context permission
      *
      * @return array
      */
-    public function getContextsWithPermissions(): array
+    public function getContextPermission(): array
     {
-        $contexts = [];
-        foreach ($this->permissions as $context => $permissions) {
-            $contexts[$context] = array_map(function ($permission) {
-                return $permission['permission'];
-            }, $permissions);
-        }
+        return array_keys($this->permissions);
+    }
 
-        return $contexts;
+    /**
+     * Get all permissions in associative format
+     *
+     * @param string|null $context
+     *
+     * @return array
+     */
+    public function getFlatPermissions(string $context = null): array
+    {
+        if ($context) {
+            return array_map(function ($perm) {
+                return $perm['perm'];
+            }, $this->permissions[$context] ?? []);
+        } else {
+            return array_merge(...array_map(function ($permissions) {
+                return array_map(function ($perm) {
+                    return $perm['perm'];
+                }, $permissions);
+            }, $this->permissions));
+        }
+    }
+
+    /**
+     * Get all permissions in language format
+     *
+     * @param string|null $context
+     *
+     * @return array
+     */
+    public function getLangPermissions(string $context = null): array
+    {
+        if ($context) {
+            return array_map(function ($perm) {
+                return $perm['lang'];
+            }, $this->permissions[$context] ?? []);
+        } else {
+            return array_merge(...array_map(function ($permissions) {
+                return array_map(function ($perm) {
+                    return $perm['lang'];
+                }, $permissions);
+            }, $this->permissions));
+        }
+    }
+
+    /**
+     * Get all permissions in flat language format
+     *
+     * @param string|null $context
+     *
+     * @return array
+     */
+    public function getFlatLangPermissions(string $context = null): array
+    {
+        if ($context) {
+            return $this->permissions[$context] ?? [];
+        } else {
+            return $this->permissions;
+        }
+    }
+
+    /**
+     * Get all permissions in associative format
+     *
+     * @param string|null $context
+     *
+     * @return array
+     */
+    public function getAssocPermissions(string $context = null): array
+    {
+        if ($context) {
+            return array_reduce($this->permissions[$context] ?? [], function ($carry, $perm) {
+                $carry[$perm['perm']] = $perm['lang'];
+                return $carry;
+            }, []);
+        } else {
+            $permissions = [];
+            foreach ($this->permissions as $index => $perms) {
+                $permissions[$index] = $this->getAssocPermissions($index);
+            }
+
+            return $permissions;
+        }
     }
 }
