@@ -17,10 +17,10 @@ return new class extends Migration {
         Schema::create(config('rolix.tables.role'), function (Blueprint $table) {
             $table->id();
 
-            $table->string('type')->nullable()->index();
+            $table->string('type')->index();
             /**
              * The context or scope this role belongs to.
-             * Examples: 'administrator', 'tenant.1', 'team.2'
+             * Examples: 'department', 'tenant.1', 'team.2'
              * Used to group and categorize roles within the system.
              */
 
