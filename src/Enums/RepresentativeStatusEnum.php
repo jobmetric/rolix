@@ -2,7 +2,7 @@
 
 namespace JobMetric\Rolix\Enums;
 
-use JobMetric\PackageCore\Enums\EnumToArray;
+use JobMetric\PackageCore\Enums\EnumMacros;
 
 /**
  * Enum representing the various statuses of a representative delegation request.
@@ -15,7 +15,7 @@ use JobMetric\PackageCore\Enums\EnumToArray;
  */
 enum RepresentativeStatusEnum: string
 {
-    use EnumToArray;
+    use EnumMacros;
 
     /** The delegation request is pending and awaiting action */
     case PENDING = "pending";

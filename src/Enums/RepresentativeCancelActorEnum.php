@@ -2,7 +2,7 @@
 
 namespace JobMetric\Rolix\Enums;
 
-use JobMetric\PackageCore\Enums\EnumToArray;
+use JobMetric\PackageCore\Enums\EnumMacros;
 
 /**
  * Enum representing the actor who initiated the cancellation of a representative request.
@@ -14,7 +14,7 @@ use JobMetric\PackageCore\Enums\EnumToArray;
  */
 enum RepresentativeCancelActorEnum: string
 {
-    use EnumToArray;
+    use EnumMacros;
 
     /** Cancellation initiated by the user */
     case USER = "user";

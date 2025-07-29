@@ -2,7 +2,7 @@
 
 namespace JobMetric\Rolix\Enums;
 
-use JobMetric\PackageCore\Enums\EnumToArray;
+use JobMetric\PackageCore\Enums\EnumMacros;
 
 /**
  * Enum representing various reasons why a representative request may be rejected.
@@ -21,7 +21,7 @@ use JobMetric\PackageCore\Enums\EnumToArray;
  */
 enum RepresentativeRejectReasonEnum: string
 {
-    use EnumToArray;
+    use EnumMacros;
 
     /** Data provided by user is invalid or malformed */
     case INVALID_DATA = "invalid_data";

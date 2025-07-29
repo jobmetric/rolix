@@ -2,7 +2,7 @@
 
 namespace JobMetric\Rolix\Enums;
 
-use JobMetric\PackageCore\Enums\EnumToArray;
+use JobMetric\PackageCore\Enums\EnumMacros;
 
 /**
  * Enum representing various reasons why a representative request may be canceled.
@@ -17,7 +17,7 @@ use JobMetric\PackageCore\Enums\EnumToArray;
  */
 enum RepresentativeCancelReasonEnum: string
 {
-    use EnumToArray;
+    use EnumMacros;
 
     /** Canceled by user request */
     case USER_REQUEST = "user_request";
