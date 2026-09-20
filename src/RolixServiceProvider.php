@@ -26,7 +26,8 @@ class RolixServiceProvider extends PackageCoreServiceProvider
             ->hasConfig()
             ->hasMigration()
             ->hasTranslation()
-            ->registerClass('rolix.permission', PermissionManager::class, RegisterClassTypeEnum::SINGLETON());
+            ->registerClass('rolix.permission', PermissionManager::class, RegisterClassTypeEnum::SINGLETON())
+            ->registerClass('RoleType', RoleType::class, RegisterClassTypeEnum::SINGLETON());
     }
 
     /**

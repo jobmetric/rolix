@@ -12,7 +12,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * JobMetric\Rolix\Models\Role
  *
  * @property int $id
- * @property string|null $type
+ * @property string $type
  * @property int|null $parent_id
  * @property string $name
  * @property string|null $description

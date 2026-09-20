@@ -31,11 +31,7 @@ class TimeRangeEvaluator implements RuleEvaluatorContract
      */
     public function evaluate(array $rule, mixed $context): bool
     {
-        if (!isset($rule['value'])) {
-            return false;
-        }
-
-        $range = json_decode($rule['value'], true);
+        $range = json_decode($rule['value'] ?? '', true);
 
         if (!is_array($range) || count($range) !== 2) {
             return false;
@@ -45,7 +41,11 @@ class TimeRangeEvaluator implements RuleEvaluatorContract
 
         $now = Carbon::now()->format('H:i');
 
-        return $now >= $start && $now <= $end;
+        if ($start <= $end) {
+            return $now >= $start && $now <= $end;
+        }
+
+        return $now >= $start || $now <= $end;
     }
 
     /**
