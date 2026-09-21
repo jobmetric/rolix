@@ -8,7 +8,7 @@ use JobMetric\Rolix\Facades\Role as RoleFacade;
 use JobMetric\Rolix\Models\Role;
 use JobMetric\Rolix\Models\RolePath;
 use JobMetric\Rolix\Models\RoleRule;
-use JobMetric\Rolix\RuleEvaluators\TimeRangeEvaluator;
+use JobMetric\Rolix\RuleEvaluators\TimeEvaluator;
 use JobMetric\Rolix\Services\PermissionManager;
 use JobMetric\Rolix\Services\Role as RoleService;
 use JobMetric\Rolix\Tests\TestCase;
@@ -95,8 +95,12 @@ class RoleTest extends TestCase
             'allow' => ['hero'],
             'rules' => [
                 [
-                    'driver' => TimeRangeEvaluator::class,
-                    'payload' => ['value' => '["08:00","18:00"]'],
+                    'driver' => TimeEvaluator::class,
+                    'payload' => [
+                        'from' => '08:00',
+                        'to' => '18:00',
+                        'timezone' => 'UTC',
+                    ],
                 ],
             ],
         ], ['rules']);
@@ -105,7 +109,29 @@ class RoleTest extends TestCase
 
         $role = Role::query()->where('name', 'Timed')->first();
         $this->assertSame(1, RoleRule::query()->where('role_id', $role->id)->count());
-        $this->assertSame(TimeRangeEvaluator::class, $role->rules()->first()->driver);
+        $this->assertSame(TimeEvaluator::class, $role->rules()->first()->driver);
+    }
+
+    /**
+     * store accepts short rule driver names from the registry.
+     */
+    public function test_store_accepts_short_rule_driver_name(): void
+    {
+        $response = RoleFacade::store([
+            'name' => 'Env Timed',
+            'allow' => ['hero'],
+            'rules' => [
+                [
+                    'driver' => 'env',
+                    'payload' => ['environments' => 'testing'],
+                ],
+            ],
+        ], ['rules']);
+
+        $this->assertTrue($response->ok);
+
+        $role = Role::query()->where('name', 'Env Timed')->first();
+        $this->assertSame('env', $role->rules()->first()->driver);
     }
 
     /**

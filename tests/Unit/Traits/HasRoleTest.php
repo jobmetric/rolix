@@ -127,4 +127,50 @@ class HasRoleTest extends TestCase
 
         $this->assertFalse($person->hasPermission('hero'));
     }
+
+    /**
+     * Role rules resolved by short driver name can block permissions.
+     */
+    public function test_role_rule_short_name_blocks_permission_when_failing(): void
+    {
+        $person = Person::create(['name' => 'Alice']);
+        $role = Role::factory()->setType('system')->setAllow(['hero'])->create();
+
+        $role->rules()->create([
+            'driver' => 'env',
+            'payload' => ['environments' => 'production'],
+        ]);
+
+        Membership::factory()
+            ->setPersonable(Person::class, $person->id)
+            ->system()
+            ->setRoleId($role->id)
+            ->setExpiredAt(null)
+            ->create();
+
+        $this->assertFalse($person->hasPermission('hero'));
+    }
+
+    /**
+     * Role rules resolved by short driver name allow permissions when passing.
+     */
+    public function test_role_rule_short_name_allows_permission_when_passing(): void
+    {
+        $person = Person::create(['name' => 'Alice']);
+        $role = Role::factory()->setType('system')->setAllow(['hero'])->create();
+
+        $role->rules()->create([
+            'driver' => 'env',
+            'payload' => ['environments' => 'testing'],
+        ]);
+
+        Membership::factory()
+            ->setPersonable(Person::class, $person->id)
+            ->system()
+            ->setRoleId($role->id)
+            ->setExpiredAt(null)
+            ->create();
+
+        $this->assertTrue($person->hasPermission('hero'));
+    }
 }

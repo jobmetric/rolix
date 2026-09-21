@@ -5,6 +5,8 @@ namespace JobMetric\Rolix\Tests;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Schema;
+use JobMetric\CustomField\CustomFieldServiceProvider;
+use JobMetric\Form\FormServiceProvider;
 use JobMetric\Rolix\RolixServiceProvider;
 use Orchestra\Testbench\TestCase as BaseTestCase;
 
@@ -21,6 +23,8 @@ abstract class TestCase extends BaseTestCase
     protected function getPackageProviders($app): array
     {
         return [
+            CustomFieldServiceProvider::class,
+            FormServiceProvider::class,
             RolixServiceProvider::class,
         ];
     }
@@ -68,6 +72,9 @@ abstract class TestCase extends BaseTestCase
             Schema::create('rolix_test_persons', function (Blueprint $table) {
                 $table->id();
                 $table->string('name')->nullable();
+                $table->string('status')->nullable();
+                $table->string('country')->nullable();
+                $table->string('city')->nullable();
                 $table->timestamps();
             });
         }

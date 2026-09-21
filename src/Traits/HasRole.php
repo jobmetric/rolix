@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Support\Collection;
 use JobMetric\Rolix\Contracts\RuleEvaluatorContract;
+use JobMetric\Rolix\Facades\RuleEvaluatorRegistry;
 use JobMetric\Rolix\Models\Membership;
 use JobMetric\Rolix\Models\Role;
 
@@ -127,11 +128,11 @@ trait HasRole
         $role->loadMissing('rules');
 
         foreach ($role->rules as $rule) {
-            if (! is_string($rule->driver) || ! class_exists($rule->driver)) {
+            if (! is_string($rule->driver)) {
                 return false;
             }
 
-            $driver = app($rule->driver);
+            $driver = RuleEvaluatorRegistry::get($rule->driver);
 
             if (! $driver instanceof RuleEvaluatorContract) {
                 return false;

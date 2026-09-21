@@ -20,20 +20,20 @@ class RoleRuleFactory extends Factory
     public function definition(): array
     {
         $drivers = [
-            'TimeEvaluator',
-            'UserStatusEvaluator',
-            'WeekdayEvaluator',
-            'IpRangeEvaluator',
-            'LocationEvaluator',
-            'CustomExpressionEvaluator',
-            'EnvEvaluator',
-            'RoleCountEvaluator',
-            'QuotaEvaluator',
+            \JobMetric\Rolix\RuleEvaluators\TimeEvaluator::class,
+            \JobMetric\Rolix\RuleEvaluators\UserStatusEvaluator::class,
+            \JobMetric\Rolix\RuleEvaluators\WeekdayEvaluator::class,
+            \JobMetric\Rolix\RuleEvaluators\IpRangeEvaluator::class,
+            \JobMetric\Rolix\RuleEvaluators\LocationEvaluator::class,
+            \JobMetric\Rolix\RuleEvaluators\CustomExpressionEvaluator::class,
+            \JobMetric\Rolix\RuleEvaluators\EnvEvaluator::class,
+            \JobMetric\Rolix\RuleEvaluators\RoleCountEvaluator::class,
+            \JobMetric\Rolix\RuleEvaluators\QuotaEvaluator::class,
         ];
 
         return [
             'role_id' => null,
-            'driver' => $this->faker->randomElement($drivers),
+            'driver'  => $this->faker->randomElement($drivers),
             'payload' => [],
         ];
     }
@@ -47,8 +47,8 @@ class RoleRuleFactory extends Factory
      */
     public function setRoleId(int $role_id): static
     {
-        return $this->state(fn(array $attributes) => [
-            'role_id' => $role_id
+        return $this->state(fn (array $attributes) => [
+            'role_id' => $role_id,
         ]);
     }
 
@@ -61,8 +61,8 @@ class RoleRuleFactory extends Factory
      */
     public function setDriver(string $driver): static
     {
-        return $this->state(fn(array $attributes) => [
-            'driver' => $driver
+        return $this->state(fn (array $attributes) => [
+            'driver' => $driver,
         ]);
     }
 
@@ -75,8 +75,8 @@ class RoleRuleFactory extends Factory
      */
     public function setPayload(array $payload): static
     {
-        return $this->state(fn(array $attributes) => [
-            'payload' => $payload
+        return $this->state(fn (array $attributes) => [
+            'payload' => $payload,
         ]);
     }
 }

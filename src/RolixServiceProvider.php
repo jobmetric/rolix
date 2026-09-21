@@ -10,9 +10,20 @@ use JobMetric\PackageCore\PackageCoreServiceProvider;
 use JobMetric\Rolix\Events\RegisterPathPermissionEvent;
 use JobMetric\Rolix\Facades\Permission;
 use JobMetric\Rolix\Facades\RoleTypeRegistry as FacadeRoleTypeRegistry;
+use JobMetric\Rolix\Facades\RuleEvaluatorRegistry as FacadeRuleEvaluatorRegistry;
+use JobMetric\Rolix\RuleEvaluators\CustomExpressionEvaluator;
+use JobMetric\Rolix\RuleEvaluators\EnvEvaluator;
+use JobMetric\Rolix\RuleEvaluators\IpRangeEvaluator;
+use JobMetric\Rolix\RuleEvaluators\LocationEvaluator;
+use JobMetric\Rolix\RuleEvaluators\QuotaEvaluator;
+use JobMetric\Rolix\RuleEvaluators\RoleCountEvaluator;
+use JobMetric\Rolix\RuleEvaluators\TimeEvaluator;
+use JobMetric\Rolix\RuleEvaluators\UserStatusEvaluator;
+use JobMetric\Rolix\RuleEvaluators\WeekdayEvaluator;
 use JobMetric\Rolix\Services\PermissionManager;
 use JobMetric\Rolix\Services\Role;
 use JobMetric\Rolix\Support\RoleTypeRegistry;
+use JobMetric\Rolix\Support\RuleEvaluatorRegistry;
 
 class RolixServiceProvider extends PackageCoreServiceProvider
 {
@@ -31,7 +42,8 @@ class RolixServiceProvider extends PackageCoreServiceProvider
             ->hasTranslation()
             ->registerClass('rolix.permission', PermissionManager::class, RegisterClassTypeEnum::SINGLETON())
             ->registerClass('role', Role::class, RegisterClassTypeEnum::SINGLETON())
-            ->registerClass('RoleTypeRegistry', RoleTypeRegistry::class, RegisterClassTypeEnum::SINGLETON());
+            ->registerClass('RoleTypeRegistry', RoleTypeRegistry::class, RegisterClassTypeEnum::SINGLETON())
+            ->registerClass('RuleEvaluatorRegistry', RuleEvaluatorRegistry::class, RegisterClassTypeEnum::SINGLETON());
     }
 
     /**
@@ -44,6 +56,21 @@ class RolixServiceProvider extends PackageCoreServiceProvider
         // Register role types from config
         foreach (config('rolix.types', []) as $type => $options) {
             FacadeRoleTypeRegistry::register($type, is_array($options) ? $options : []);
+        }
+
+        foreach (
+            [
+                TimeEvaluator::class,
+                WeekdayEvaluator::class,
+                UserStatusEvaluator::class,
+                IpRangeEvaluator::class,
+                LocationEvaluator::class,
+                EnvEvaluator::class,
+                RoleCountEvaluator::class,
+                QuotaEvaluator::class,
+                CustomExpressionEvaluator::class,
+            ] as $evaluator) {
+            FacadeRuleEvaluatorRegistry::register($evaluator);
         }
     }
 

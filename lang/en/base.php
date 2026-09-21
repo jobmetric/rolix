@@ -64,4 +64,107 @@ return [
         ],
     ],
 
+    'rule_evaluators' => [
+        'common' => [
+            'settings_tab' => 'Settings',
+        ],
+        'time' => [
+            'from' => [
+                'label' => 'From',
+                'info' => 'Start of the allowed time range (HH:MM).',
+            ],
+            'to' => [
+                'label' => 'To',
+                'info' => 'End of the allowed time range (HH:MM).',
+            ],
+            'timezone' => [
+                'label' => 'Timezone',
+                'info' => 'IANA timezone used for evaluation (defaults to app timezone).',
+            ],
+        ],
+        'weekday' => [
+            'days' => [
+                'label' => 'Days',
+                'info' => 'Allowed weekdays.',
+            ],
+            'timezone' => [
+                'label' => 'Timezone',
+            ],
+            'options' => [
+                'monday' => 'Monday',
+                'tuesday' => 'Tuesday',
+                'wednesday' => 'Wednesday',
+                'thursday' => 'Thursday',
+                'friday' => 'Friday',
+                'saturday' => 'Saturday',
+                'sunday' => 'Sunday',
+            ],
+        ],
+        'user_status' => [
+            'attribute' => [
+                'label' => 'Attribute',
+                'info' => 'Personable attribute to compare (default: status).',
+            ],
+            'expected' => [
+                'label' => 'Expected value',
+                'info' => 'Value that must match the attribute.',
+            ],
+        ],
+        'ip_range' => [
+            'ranges' => [
+                'label' => 'IP ranges',
+                'info' => 'Comma-separated IPs or CIDR ranges.',
+            ],
+        ],
+        'location' => [
+            'countries' => [
+                'label' => 'Countries',
+                'info' => 'Comma-separated ISO country codes.',
+            ],
+            'cities' => [
+                'label' => 'Cities',
+                'info' => 'Comma-separated city names.',
+            ],
+        ],
+        'env' => [
+            'environments' => [
+                'label' => 'Environments',
+                'info' => 'Comma-separated environment names (e.g. production, staging).',
+            ],
+        ],
+        'role_count' => [
+            'type' => [
+                'label' => 'Role type',
+                'info' => 'Optional role type filter for membership count.',
+            ],
+            'min' => [
+                'label' => 'Minimum',
+            ],
+            'max' => [
+                'label' => 'Maximum',
+            ],
+        ],
+        'quota' => [
+            'key' => [
+                'label' => 'Quota key',
+                'info' => 'Membership collection key used for quota counting.',
+            ],
+            'limit' => [
+                'label' => 'Limit',
+            ],
+        ],
+        'custom_expression' => [
+            'left_key' => [
+                'label' => 'Left key',
+                'info' => 'Safe context or request key (e.g. status, request.ip).',
+            ],
+            'operator' => [
+                'label' => 'Operator',
+            ],
+            'right_value' => [
+                'label' => 'Right value',
+            ],
+        ],
+    ],
+
 ];

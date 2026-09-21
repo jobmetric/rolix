@@ -27,7 +27,9 @@
         "php": ">=8.0.1",
         "ext-json": "*",
         "laravel/framework": ">=9.19",
-        "jobmetric/laravel-package-core": "^1.19.4",
+        "jobmetric/laravel-package-core": "^1.35",
+        "jobmetric/laravel-form": "^1.5",
+        "jobmetric/laravel-custom-field": "^2.1",
         "spatie/laravel-query-builder": "^5.0|^6.0"
     },
     "autoload": {
@@ -46,7 +48,8 @@
             "aliases": {
                 "Role": "JobMetric\\Rolix\\Facades\\Role",
                 "Permission": "JobMetric\\Rolix\\Facades\\Permission",
-                "RoleTypeRegistry": "JobMetric\\Rolix\\Facades\\RoleTypeRegistry"
+                "RoleTypeRegistry": "JobMetric\\Rolix\\Facades\\RoleTypeRegistry",
+                "RuleEvaluatorRegistry": "JobMetric\\Rolix\\Facades\\RuleEvaluatorRegistry"
             }
         }
     },

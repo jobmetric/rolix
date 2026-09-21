@@ -2,64 +2,48 @@
 
 namespace JobMetric\Rolix\Contracts;
 
+use JobMetric\Form\FormBuilder;
+
 /**
- * Interface RuleEvaluatorContract
+ * Contract for role rule evaluators.
  *
- * This contract must be implemented by all custom rule evaluators.
- * Evaluators are responsible for determining whether a given rule passes
- * based on provided logic and the current context.
+ * Evaluators decide whether a role stays active for a given context,
+ * and expose a FormBuilder for configuring their payload in the UI.
  *
- * Example usage:
- * A time-based rule evaluator might check if the current time falls between two values.
+ * @package JobMetric\Rolix
  */
 interface RuleEvaluatorContract
 {
     /**
      * Evaluate the rule based on the provided context.
      *
-     * @param array $rule The rule definition array.
-     *                    Example:
-     *                    [
-     *                        'field' => 'time',
-     *                        'operator' => 'between',
-     *                        'value' => ['08:00', '18:00']
-     *                    ]
+     * @param array $rule    Payload stored on the role rule (e.g. from/to/timezone).
+     * @param mixed $context Personable model or other evaluation context.
      *
-     * @param mixed $context Contextual data required to evaluate the rule.
-     *                       Can be an object, array, or any data structure
-     *                       providing necessary info (e.g., user, request, etc.).
-     *
-     * @return bool Returns true if the rule evaluation passes, false otherwise.
+     * @return bool
      */
     public function evaluate(array $rule, mixed $context): bool;
 
     /**
-     * Get the unique name of the evaluator.
+     * Unique evaluator name used for registry lookup and UI.
      *
-     * This name is used internally to identify the evaluator and associate it
-     * with specific rules.
-     *
-     * Example: "time", "request_method", "user_attribute"
-     *
-     * @return string The unique evaluator name.
+     * @return string
      */
     public function name(): string;
 
     /**
-     * Get a list of configurable fields that this evaluator supports.
+     * Form definition for configuring this evaluator.
      *
-     * Each field returned should describe what data or configuration is required
-     * for this evaluator. This information can be used to build dynamic UIs
-     * or rule editors.
+     * @return FormBuilder
+     */
+    public function form(): FormBuilder;
+
+    /**
+     * Built form array for UI consumers.
      *
-     * Example return value:
-     * [
-     *     'field' => ['type' => 'string', 'required' => true],
-     *     'operator' => ['type' => 'string', 'required' => true],
-     *     'value' => ['type' => 'mixed', 'required' => true],
-     * ]
+     * Prefer form(); this remains for backward compatibility.
      *
-     * @return array Associative array describing supported fields and their metadata.
+     * @return array
      */
     public function fields(): array;
 }

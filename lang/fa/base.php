@@ -64,4 +64,107 @@ return [
         ],
     ],
 
+    'rule_evaluators' => [
+        'common' => [
+            'settings_tab' => 'تنظیمات',
+        ],
+        'time' => [
+            'from' => [
+                'label' => 'از ساعت',
+                'info' => 'شروع بازه زمانی مجاز (HH:MM).',
+            ],
+            'to' => [
+                'label' => 'تا ساعت',
+                'info' => 'پایان بازه زمانی مجاز (HH:MM).',
+            ],
+            'timezone' => [
+                'label' => 'منطقه زمانی',
+                'info' => 'منطقه زمانی IANA برای ارزیابی (پیش‌فرض: منطقه زمانی برنامه).',
+            ],
+        ],
+        'weekday' => [
+            'days' => [
+                'label' => 'روزهای هفته',
+                'info' => 'روزهای مجاز هفته.',
+            ],
+            'timezone' => [
+                'label' => 'منطقه زمانی',
+            ],
+            'options' => [
+                'monday' => 'دوشنبه',
+                'tuesday' => 'سه‌شنبه',
+                'wednesday' => 'چهارشنبه',
+                'thursday' => 'پنج‌شنبه',
+                'friday' => 'جمعه',
+                'saturday' => 'شنبه',
+                'sunday' => 'یکشنبه',
+            ],
+        ],
+        'user_status' => [
+            'attribute' => [
+                'label' => 'ویژگی',
+                'info' => 'ویژگی شخص برای مقایسه (پیش‌فرض: status).',
+            ],
+            'expected' => [
+                'label' => 'مقدار مورد انتظار',
+                'info' => 'مقداری که باید با ویژگی برابر باشد.',
+            ],
+        ],
+        'ip_range' => [
+            'ranges' => [
+                'label' => 'بازه IP',
+                'info' => 'آدرس‌های IP یا CIDR جداشده با کاما.',
+            ],
+        ],
+        'location' => [
+            'countries' => [
+                'label' => 'کشورها',
+                'info' => 'کدهای ISO کشور جداشده با کاما.',
+            ],
+            'cities' => [
+                'label' => 'شهرها',
+                'info' => 'نام شهرها جداشده با کاما.',
+            ],
+        ],
+        'env' => [
+            'environments' => [
+                'label' => 'محیط‌ها',
+                'info' => 'نام محیط‌ها جداشده با کاما (مثل production و staging).',
+            ],
+        ],
+        'role_count' => [
+            'type' => [
+                'label' => 'نوع نقش',
+                'info' => 'فیلتر اختیاری نوع نقش برای شمارش عضویت.',
+            ],
+            'min' => [
+                'label' => 'حداقل',
+            ],
+            'max' => [
+                'label' => 'حداکثر',
+            ],
+        ],
+        'quota' => [
+            'key' => [
+                'label' => 'کلید سهمیه',
+                'info' => 'کلید collection عضویت برای شمارش سهمیه.',
+            ],
+            'limit' => [
+                'label' => 'سقف',
+            ],
+        ],
+        'custom_expression' => [
+            'left_key' => [
+                'label' => 'کلید چپ',
+                'info' => 'کلید امن از context یا request (مثل status یا request.ip).',
+            ],
+            'operator' => [
+                'label' => 'عملگر',
+            ],
+            'right_value' => [
+                'label' => 'مقدار راست',
+            ],
+        ],
+    ],
+
 ];

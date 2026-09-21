@@ -4,9 +4,9 @@ namespace JobMetric\Rolix\Http\Requests\Role;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Validator;
-use JobMetric\Rolix\Contracts\RuleEvaluatorContract;
 use JobMetric\Rolix\Facades\Permission;
 use JobMetric\Rolix\Facades\RoleTypeRegistry;
+use JobMetric\Rolix\Facades\RuleEvaluatorRegistry;
 use JobMetric\Rolix\Models\Role;
 
 /**
@@ -147,7 +147,7 @@ class UpdateRoleRequest extends FormRequest
             foreach ($data['rules'] ?? [] as $index => $rule) {
                 $driver = $rule['driver'] ?? null;
 
-                if (! is_string($driver) || ! class_exists($driver) || ! is_subclass_of($driver, RuleEvaluatorContract::class)) {
+                if (! is_string($driver) || ! RuleEvaluatorRegistry::has($driver)) {
                     $v->errors()->add("rules.$index.driver", trans('rolix::base.validation.role.rule_driver_invalid'));
                 }
             }
