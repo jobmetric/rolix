@@ -22,10 +22,6 @@ class RoleActivityLogFactory extends Factory
         $actions = [
             'assign_role',
             'remove_role',
-            'delegate_role',
-            'revoke_delegate',
-            'reject_delegate',
-            'approve_delegate',
             'create_role',
             'update_role',
             'delete_role',

@@ -1,7 +1,7 @@
 # Rolix
 
-An advanced role, membership, and delegation system for Laravel — built for large-scale, multi-tenant, and modular applications.
-It provides a robust solution for managing roles, permissions, and user memberships, allowing for flexible delegation of responsibilities across various modules.
+An advanced role and membership system for Laravel — built for large-scale, multi-tenant, and modular applications.
+It provides a robust solution for managing roles, permissions, and user memberships across various modules.
 
 ## Install via composer
 

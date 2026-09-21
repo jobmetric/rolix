@@ -5,7 +5,6 @@ namespace JobMetric\Rolix\Traits;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Support\Collection;
 use JobMetric\Rolix\Models\Membership;
-use JobMetric\Rolix\Models\Representative;
 use JobMetric\Rolix\Models\Role;
 
 trait HasRole
@@ -13,12 +12,8 @@ trait HasRole
     public function hasPermission(string $permission, $context = null): bool
     {
         $memberships = $this->validMemberships($context);
-        $representatives = $this->validDelegations($context);
 
-        $roles = collect()
-            ->merge($this->extractRolesFromMemberships($memberships))
-            ->merge($this->extractRolesFromDelegations($representatives))
-            ->unique('id');
+        $roles = $this->extractRolesFromMemberships($memberships)->unique('id');
 
         $permissions = $this->collectPermissions($memberships, $roles);
 
@@ -43,36 +38,9 @@ trait HasRole
             ->get();
     }
 
-    public function delegations(): MorphMany
-    {
-        return $this->morphMany(Representative::class, 'to_personable');
-    }
-
-    protected function validDelegations($context = null): Collection
-    {
-        return $this->delegations()
-            ->where('status', 'active')
-            ->where(function ($q) {
-                $q->whereNull('expired_at')->orWhere('expired_at', '>', now());
-            })
-            ->when($context, function ($query) use ($context) {
-                $query->where('delegatable_type', get_class($context))
-                    ->where('delegatable_id', $context->id);
-            })
-            ->get();
-    }
-
     protected function extractRolesFromMemberships(Collection $memberships): Collection
     {
         return Role::whereIn('id', $memberships->pluck('role_id')->filter())->get()
-            ->flatMap(function ($role) {
-                return $this->getRoleWithAncestorsIfValid($role);
-            });
-    }
-
-    protected function extractRolesFromDelegations(Collection $reps): Collection
-    {
-        return Role::whereIn('id', $reps->pluck('role_id')->filter())->get()
             ->flatMap(function ($role) {
                 return $this->getRoleWithAncestorsIfValid($role);
             });
@@ -104,13 +72,13 @@ trait HasRole
         $allow = [];
         $deny = [];
 
-        // اول از خود membership ها
+        // From memberships first
         foreach ($memberships as $membership) {
             $allow = array_merge($allow, $membership->allow ?? []);
             $deny = array_merge($deny, $membership->deny ?? []);
         }
 
-        // بعد از خود roleها
+        // Then from roles
         foreach ($roles as $role) {
             $allow = array_merge($allow, $role->allow ?? []);
             $deny = array_merge($deny, $role->deny ?? []);

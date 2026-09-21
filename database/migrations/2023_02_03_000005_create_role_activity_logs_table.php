@@ -8,8 +8,8 @@ return new class extends Migration {
     /**
      * Create the role_activity_logs table.
      *
-     * This table logs all significant actions related to roles, memberships,
-     * and delegations for auditing, troubleshooting, and accountability purposes.
+     * This table logs all significant actions related to roles and memberships
+     * for auditing, troubleshooting, and accountability purposes.
      */
     public function up(): void
     {
@@ -19,7 +19,7 @@ return new class extends Migration {
             $table->string('action')->index();
             /**
              * The type of action performed.
-             * Examples: assign_role, remove_role, delegate_role, revoke_delegate, reject_delegate, etc.
+             * Examples: assign_role, remove_role, create_role, update_role, delete_role, etc.
              */
 
             $table->morphs('actor');
@@ -42,7 +42,7 @@ return new class extends Migration {
             $table->morphs('subject');
             /**
              * The subject entity representing the affected object.
-             * For example: a Role, a Membership, or a Representative.
+             * For example: a Role or a Membership.
              */
 
             $table->text('reason')->nullable()->index();
