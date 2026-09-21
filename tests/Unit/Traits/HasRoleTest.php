@@ -89,4 +89,42 @@ class HasRoleTest extends TestCase
 
         $this->assertTrue($person->hasPermission('custom.action'));
     }
+
+    /**
+     * Super membership grants any permission regardless of context.
+     */
+    public function test_super_membership_grants_all_permissions(): void
+    {
+        RoleTypeRegistry::register('tenant', ['model' => Tenant::class]);
+
+        $person = Person::create(['name' => 'Alice']);
+        $tenant = Tenant::create(['name' => 'Acme']);
+        $super = Role::factory()->super()->setName('Super')->create();
+
+        Membership::factory()
+            ->setPersonable(Person::class, $person->id)
+            ->system()
+            ->setRoleId($super->id)
+            ->create();
+
+        $this->assertTrue($person->hasPermission('anything.at.all'));
+        $this->assertTrue($person->hasPermission('tenant.view', $tenant));
+    }
+
+    /**
+     * Deny takes precedence over allow.
+     */
+    public function test_deny_takes_precedence_over_allow(): void
+    {
+        $person = Person::create(['name' => 'Alice']);
+        $role = Role::factory()->setType('system')->setAllow(['hero'])->setDeny(['hero'])->create();
+
+        Membership::factory()
+            ->setPersonable(Person::class, $person->id)
+            ->system()
+            ->setRoleId($role->id)
+            ->create();
+
+        $this->assertFalse($person->hasPermission('hero'));
+    }
 }

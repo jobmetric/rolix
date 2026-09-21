@@ -38,7 +38,7 @@ return [
         'system' => [
             'label' => 'rolix::base.types.system.label',
             'description' => 'rolix::base.types.system.description',
-            'hierarchical' => false,
+            'hierarchical' => true,
         ],
         // 'department' => [
         //     'label' => 'rolix::base.types.department.label',

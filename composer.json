@@ -27,7 +27,8 @@
         "php": ">=8.0.1",
         "ext-json": "*",
         "laravel/framework": ">=9.19",
-        "jobmetric/laravel-package-core": "^1.19.4"
+        "jobmetric/laravel-package-core": "^1.19.4",
+        "spatie/laravel-query-builder": "^5.0|^6.0"
     },
     "autoload": {
         "files": [
@@ -43,7 +44,9 @@
                 "JobMetric\\Rolix\\RolixServiceProvider"
             ],
             "aliases": {
-                "Pax": "JobMetric\\Rolix\\Facades\\Rolix"
+                "Role": "JobMetric\\Rolix\\Facades\\Role",
+                "Permission": "JobMetric\\Rolix\\Facades\\Permission",
+                "RoleTypeRegistry": "JobMetric\\Rolix\\Facades\\RoleTypeRegistry"
             }
         }
     },

@@ -4,6 +4,7 @@ namespace JobMetric\Rolix\Tests\Feature;
 
 use JobMetric\Rolix\Facades\RoleTypeRegistry;
 use JobMetric\Rolix\Services\PermissionManager;
+use JobMetric\Rolix\Services\Role;
 use JobMetric\Rolix\Support\RoleTypeRegistry as RoleTypeRegistryService;
 use JobMetric\Rolix\Tests\TestCase;
 
@@ -29,6 +30,14 @@ class RolixServiceProviderTest extends TestCase
     }
 
     /**
+     * Role service is resolvable from container.
+     */
+    public function test_role_service_is_resolvable(): void
+    {
+        $this->assertInstanceOf(Role::class, $this->app->make('role'));
+    }
+
+    /**
      * Default system type is registered from config.
      */
     public function test_default_system_type_is_registered(): void
@@ -36,5 +45,6 @@ class RolixServiceProviderTest extends TestCase
         $this->assertTrue(RoleTypeRegistry::has('system'));
         $this->assertTrue(RoleTypeRegistry::isSystem('system'));
         $this->assertNull(RoleTypeRegistry::getModel('system'));
+        $this->assertTrue(RoleTypeRegistry::getOption('system', 'hierarchical'));
     }
 }

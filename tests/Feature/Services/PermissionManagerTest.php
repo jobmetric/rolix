@@ -85,4 +85,28 @@ class PermissionManagerTest extends TestCase
 
         $manager->addPermissionFile('hero', '/tmp/does-not-exist-' . uniqid() . '.php');
     }
+
+    /**
+     * getPermissionTree nests dotted keys.
+     */
+    public function test_getPermissionTree_nests_dotted_keys(): void
+    {
+        $file = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'rolix_perm_tree_' . uniqid('', true) . '.php';
+        file_put_contents($file, "<?php\nreturn [\n    'hero' => 'L1',\n    'hero.content' => 'L2',\n    'hero.content.edit' => 'L3',\n];\n");
+
+        $manager = new PermissionManager;
+        $manager->addPermissionFile('hero', $file);
+
+        $tree = $manager->getPermissionTree();
+
+        $this->assertCount(1, $tree);
+        $this->assertSame('hero', $tree[0]['perm']);
+        $this->assertSame('hero.content', $tree[0]['children'][0]['perm']);
+        $this->assertSame('hero.content.edit', $tree[0]['children'][0]['children'][0]['perm']);
+
+        $this->assertSame($tree, $manager->getPermissions(null, 'tree'));
+        $this->assertSame($tree, $manager->getPermissionTreeForType('system'));
+
+        @unlink($file);
+    }
 }

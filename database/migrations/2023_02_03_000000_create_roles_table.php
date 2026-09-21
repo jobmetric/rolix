@@ -63,6 +63,12 @@ return new class extends Migration {
              * Only one default role should exist per type/category.
              */
 
+            $table->boolean('is_super')->default(false)->index();
+            /**
+             * Super role: cannot be deleted and grants full system access.
+             * Allow/deny lists are ignored for this role.
+             */
+
             $table->unsignedInteger('ordering')->default(0)->index();
             /**
              * Determines the display or evaluation order of roles.

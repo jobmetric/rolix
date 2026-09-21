@@ -5,6 +5,7 @@ namespace JobMetric\Rolix\Traits;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Support\Collection;
+use JobMetric\Rolix\Contracts\RuleEvaluatorContract;
 use JobMetric\Rolix\Models\Membership;
 use JobMetric\Rolix\Models\Role;
 
@@ -18,6 +19,7 @@ trait HasRole
     /**
      * Check whether the person has a permission, optionally within a memberable context.
      *
+     * Super membership grants all permissions regardless of context.
      * Without context, only system memberships (null memberable) apply.
      * With context, only memberships for that entity apply.
      *
@@ -26,8 +28,12 @@ trait HasRole
      *
      * @return bool
      */
-    public function hasPermission(string $permission, $context = null): bool
+    public function hasPermission(string $permission, Model $context = null): bool
     {
+        if ($this->hasSuperMembership()) {
+            return true;
+        }
+
         $memberships = $this->validMemberships($context);
 
         $roles = $this->extractRolesFromMemberships($memberships)->unique('id');
@@ -48,21 +54,35 @@ trait HasRole
     }
 
     /**
+     * Whether the person has any active super-role membership.
+     *
+     * @return bool
+     */
+    protected function hasSuperMembership(): bool
+    {
+        return $this->memberships()->where(function ($q) {
+            $q->whereNull('expired_at')->orWhere('expired_at', '>', now());
+        })->whereHas('role', function ($q) {
+            $q->where('is_super', true);
+        })->exists();
+    }
+
+    /**
      * Load non-expired memberships for system or a specific memberable context.
      *
      * @param Model|null $context
      *
      * @return Collection
      */
-    protected function validMemberships($context = null): Collection
+    protected function validMemberships(Model $context = null): Collection
     {
         return $this->memberships()->when($context, function ($query) use ($context) {
-                $query->where('memberable_type', $context->getMorphClass())->where('memberable_id', $context->getKey());
-            }, function ($query) {
-                $query->whereNull('memberable_type')->whereNull('memberable_id');
-            })->where(function ($q) {
-                $q->whereNull('expired_at')->orWhere('expired_at', '>', now());
-            })->get();
+            $query->where('memberable_type', $context->getMorphClass())->where('memberable_id', $context->getKey());
+        }, function ($query) {
+            $query->whereNull('memberable_type')->whereNull('memberable_id');
+        })->where(function ($q) {
+            $q->whereNull('expired_at')->orWhere('expired_at', '>', now());
+        })->get();
     }
 
     /**
@@ -75,8 +95,8 @@ trait HasRole
     protected function extractRolesFromMemberships(Collection $memberships): Collection
     {
         return Role::whereIn('id', $memberships->pluck('role_id')->filter())->get()->flatMap(function ($role) {
-                return $this->getRoleWithAncestorsIfValid($role);
-            });
+            return $this->getRoleWithAncestorsIfValid($role);
+        });
     }
 
     /**
@@ -88,11 +108,7 @@ trait HasRole
      */
     protected function getRoleWithAncestorsIfValid(Role $role): Collection
     {
-        $roles = collect([$role]);
-
-        if (method_exists($role, 'ancestors')) {
-            $roles = $roles->merge($role->ancestors());
-        }
+        $roles = collect([$role])->merge($role->ancestors());
 
         return $roles->filter(function ($role) {
             return $this->evaluateRoleRules($role);
@@ -108,13 +124,22 @@ trait HasRole
      */
     protected function evaluateRoleRules(Role $role): bool
     {
-        if (! method_exists($role, 'rules') && ! isset($role->rules)) {
-            return true;
-        }
+        $role->loadMissing('rules');
 
         foreach ($role->rules as $rule) {
+            if (! is_string($rule->driver) || ! class_exists($rule->driver)) {
+                return false;
+            }
+
             $driver = app($rule->driver);
-            if (method_exists($driver, 'evaluate') && ! $driver->evaluate($this, $rule->payload)) {
+
+            if (! $driver instanceof RuleEvaluatorContract) {
+                return false;
+            }
+
+            $payload = is_array($rule->payload) ? $rule->payload : [];
+
+            if (! $driver->evaluate($payload, $this)) {
                 return false;
             }
         }
@@ -135,13 +160,11 @@ trait HasRole
         $allow = [];
         $deny = [];
 
-        // From memberships first
         foreach ($memberships as $membership) {
             $allow = array_merge($allow, $membership->allow ?? []);
             $deny = array_merge($deny, $membership->deny ?? []);
         }
 
-        // Then from roles
         foreach ($roles as $role) {
             $allow = array_merge($allow, $role->allow ?? []);
             $deny = array_merge($deny, $role->deny ?? []);
@@ -163,11 +186,11 @@ trait HasRole
      */
     protected function evaluatePermissions(array $permissions, string $permission): bool
     {
-        if (in_array($permission, $permissions['deny'])) {
+        if (in_array($permission, $permissions['deny'], true)) {
             return false;
         }
 
-        if (in_array($permission, $permissions['allow'])) {
+        if (in_array($permission, $permissions['allow'], true)) {
             return true;
         }
 

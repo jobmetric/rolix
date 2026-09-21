@@ -22,13 +22,20 @@ class RolePath extends Pivot
 {
     use HasFactory;
 
+    /**
+     * Indicates if the IDs are auto-incrementing.
+     *
+     * @var bool
+     */
+    public $incrementing = false;
+
     public $timestamps = false;
 
     protected $fillable = [
         'type',
         'role_id',
         'path_id',
-        'level'
+        'level',
     ];
 
     /**
@@ -37,10 +44,10 @@ class RolePath extends Pivot
      * @var array<string, string>
      */
     protected $casts = [
-        'type' => 'string',
+        'type'    => 'string',
         'role_id' => 'integer',
         'path_id' => 'integer',
-        'level' => 'integer'
+        'level'   => 'integer',
     ];
 
     public function getTable()

@@ -3,6 +3,8 @@
 namespace JobMetric\Rolix\Services;
 
 use InvalidArgumentException;
+use JobMetric\Rolix\Exceptions\RoleTypeNotFoundException;
+use JobMetric\Rolix\Facades\RoleTypeRegistry;
 
 /**
  * Loads and serves permission definitions grouped by context and optional model.
@@ -77,6 +79,7 @@ class PermissionManager
             'flat' => $this->getFlatPermissions($context, $model),
             'lang' => $this->getLangPermissions($context, $model),
             'flat_lang' => $this->getFlatLangPermissions($context, $model),
+            'tree' => $this->getPermissionTree($model),
             default => $this->getAssocPermissions($context, $model),
         };
     }
@@ -213,6 +216,110 @@ class PermissionManager
         }
 
         return $permissions;
+    }
+
+    /**
+     * Build a nested permission tree from dotted keys for a model scope.
+     *
+     * @param string|null $model
+     *
+     * @return array<int, array{perm: string, lang: string|null, children: array}>
+     */
+    public function getPermissionTree(?string $model = null): array
+    {
+        $flatLang = [];
+
+        foreach ($this->bucketFor($model) as $items) {
+            foreach ($items as $item) {
+                if (! isset($item['perm'])) {
+                    continue;
+                }
+
+                $flatLang[$item['perm']] = $item['lang'] ?? null;
+            }
+        }
+
+        ksort($flatLang);
+
+        $nodes = [];
+
+        foreach ($flatLang as $perm => $lang) {
+            $nodes[$perm] = [
+                'perm'     => $perm,
+                'lang'     => $lang,
+                'children' => [],
+            ];
+        }
+
+        $roots = [];
+
+        foreach (array_keys($nodes) as $perm) {
+            $parentPerm = $this->parentPermissionKey($perm);
+
+            if ($parentPerm !== null && isset($nodes[$parentPerm])) {
+                $nodes[$parentPerm]['children'][] = &$nodes[$perm];
+            }
+            else {
+                $roots[] = &$nodes[$perm];
+            }
+        }
+
+        return $this->detachTreeReferences($roots);
+    }
+
+    /**
+     * Clone tree nodes to break PHP reference links.
+     *
+     * @param array $nodes
+     *
+     * @return array
+     */
+    protected function detachTreeReferences(array $nodes): array
+    {
+        $result = [];
+
+        foreach ($nodes as $node) {
+            $result[] = [
+                'perm'     => $node['perm'],
+                'lang'     => $node['lang'],
+                'children' => $this->detachTreeReferences($node['children'] ?? []),
+            ];
+        }
+
+        return $result;
+    }
+
+    /**
+     * Build a permission tree for a registered role type.
+     *
+     * @param string $type
+     *
+     * @return array<int, array{perm: string, lang: string|null, children: array}>
+     * @throws RoleTypeNotFoundException
+     */
+    public function getPermissionTreeForType(string $type): array
+    {
+        RoleTypeRegistry::ensure($type);
+
+        return $this->getPermissionTree(RoleTypeRegistry::getModel($type));
+    }
+
+    /**
+     * Resolve the parent dotted permission key, if any.
+     *
+     * @param string $perm
+     *
+     * @return string|null
+     */
+    protected function parentPermissionKey(string $perm): ?string
+    {
+        $pos = strrpos($perm, '.');
+
+        if ($pos === false) {
+            return null;
+        }
+
+        return substr($perm, 0, $pos);
     }
 
     /**

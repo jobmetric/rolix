@@ -11,6 +11,7 @@ use JobMetric\Rolix\Events\RegisterPathPermissionEvent;
 use JobMetric\Rolix\Facades\Permission;
 use JobMetric\Rolix\Facades\RoleTypeRegistry as FacadeRoleTypeRegistry;
 use JobMetric\Rolix\Services\PermissionManager;
+use JobMetric\Rolix\Services\Role;
 use JobMetric\Rolix\Support\RoleTypeRegistry;
 
 class RolixServiceProvider extends PackageCoreServiceProvider
@@ -29,6 +30,7 @@ class RolixServiceProvider extends PackageCoreServiceProvider
             ->hasMigration()
             ->hasTranslation()
             ->registerClass('rolix.permission', PermissionManager::class, RegisterClassTypeEnum::SINGLETON())
+            ->registerClass('role', Role::class, RegisterClassTypeEnum::SINGLETON())
             ->registerClass('RoleTypeRegistry', RoleTypeRegistry::class, RegisterClassTypeEnum::SINGLETON());
     }
 

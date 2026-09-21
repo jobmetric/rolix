@@ -27,6 +27,7 @@ class RoleFactory extends Factory
             'allow' => [],
             'deny' => [],
             'is_default' => $this->faker->boolean,
+            'is_super' => false,
             'ordering' => $this->faker->numberBetween(1, 100),
         ];
     }
@@ -127,6 +128,30 @@ class RoleFactory extends Factory
         return $this->state(fn(array $attributes) => [
             'is_default' => $is_default
         ]);
+    }
+
+    /**
+     * set is_super
+     *
+     * @param bool $is_super
+     *
+     * @return static
+     */
+    public function setIsSuper(bool $is_super): static
+    {
+        return $this->state(fn(array $attributes) => [
+            'is_super' => $is_super,
+        ]);
+    }
+
+    /**
+     * Super role state.
+     *
+     * @return static
+     */
+    public function super(): static
+    {
+        return $this->setIsSuper(true)->setAllow([])->setDeny([]);
     }
 
     /**

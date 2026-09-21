@@ -4,13 +4,18 @@ namespace JobMetric\Rolix\Models;
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Collection;
 use JobMetric\Rolix\Factories\RoleFactory;
 
 /**
- * JobMetric\Rolix\Models\Role
+ * Represents a role with optional hierarchy, permissions, and conditional rules.
+ *
+ * @package JobMetric\Rolix
  *
  * @property int $id
  * @property string $type
@@ -19,13 +24,18 @@ use JobMetric\Rolix\Factories\RoleFactory;
  * @property string|null $description
  * @property array|null $allow
  * @property array|null $deny
- * @property boolean $is_default
+ * @property bool $is_default
+ * @property bool $is_super
  * @property int $ordering
  * @property Carbon $created_at
  * @property Carbon $updated_at
  *
- * @method static ofType(string $type)
+ * @property-read Role|null $parent
+ * @property-read Role[] $children
+ * @property-read RolePath[] $paths
+ * @property-read RoleRule[] $rules
  *
+ * @method static Builder|Role ofType(string $type)
  * @method static find(int $int)
  * @method static findOrFail(int $id)
  * @method static create(array $array)
@@ -34,6 +44,11 @@ class Role extends Model
 {
     use HasFactory;
 
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array<int, string>
+     */
     protected $fillable = [
         'type',
         'parent_id',
@@ -42,6 +57,7 @@ class Role extends Model
         'allow',
         'deny',
         'is_default',
+        'is_super',
         'ordering',
     ];
 
@@ -58,6 +74,7 @@ class Role extends Model
         'allow'       => 'array',
         'deny'        => 'array',
         'is_default'  => 'boolean',
+        'is_super'    => 'boolean',
         'ordering'    => 'integer',
         'created_at'  => 'datetime',
         'updated_at'  => 'datetime',
@@ -73,13 +90,38 @@ class Role extends Model
         return RoleFactory::new();
     }
 
-    public function getTable()
+    /**
+     * Override the table name using config.
+     *
+     * @return string
+     */
+    public function getTable(): string
     {
         return config('rolix.tables.role', parent::getTable());
     }
 
     /**
-     * path relation.
+     * Whether this role is a super role.
+     *
+     * @return bool
+     */
+    public function isSuper(): bool
+    {
+        return (bool) $this->is_super;
+    }
+
+    /**
+     * Parent role relation.
+     *
+     * @return BelongsTo
+     */
+    public function parent(): BelongsTo
+    {
+        return $this->belongsTo(self::class, 'parent_id');
+    }
+
+    /**
+     * Path relation (closure-table rows for this role).
      *
      * @return HasMany
      */
@@ -89,13 +131,46 @@ class Role extends Model
     }
 
     /**
-     * children relation.
+     * Children roles.
      *
      * @return HasMany
      */
     public function children(): HasMany
     {
         return $this->hasMany(self::class, 'parent_id');
+    }
+
+    /**
+     * Conditional rules attached to this role.
+     *
+     * @return HasMany
+     */
+    public function rules(): HasMany
+    {
+        return $this->hasMany(RoleRule::class, 'role_id');
+    }
+
+    /**
+     * Ancestor roles ordered by depth (immediate parent first).
+     *
+     * @return Collection<int, Role>
+     */
+    public function ancestors(): Collection
+    {
+        $pathIds = RolePath::query()
+            ->where('role_id', $this->id)
+            ->where('level', '>', 0)
+            ->orderBy('level')
+            ->pluck('path_id');
+
+        if ($pathIds->isEmpty()) {
+            return collect();
+        }
+
+        /** @var EloquentCollection<int, Role> $roles */
+        $roles = self::query()->whereIn('id', $pathIds)->get()->keyBy('id');
+
+        return $pathIds->map(fn ($id) => $roles->get($id))->filter()->values();
     }
 
     /**

@@ -16,6 +16,8 @@ use JobMetric\Rolix\Services\PermissionManager;
  * @method static array getLangPermissions(string|null $context = null, string|null $model = null)
  * @method static array getFlatLangPermissions(string|null $context = null, string|null $model = null)
  * @method static array getAssocPermissions(string|null $context = null, string|null $model = null)
+ * @method static array getPermissionTree(string|null $model = null)
+ * @method static array getPermissionTreeForType(string $type)
  */
 class Permission extends Facade
 {
