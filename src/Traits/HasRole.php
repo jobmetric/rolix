@@ -10,6 +10,7 @@ use JobMetric\Rolix\Facades\Membership as MembershipFacade;
 use JobMetric\Rolix\Facades\RuleEvaluatorRegistry;
 use JobMetric\Rolix\Models\Membership;
 use JobMetric\Rolix\Models\Role;
+use JobMetric\Rolix\Support\PermissionCache;
 
 /**
  * Adds role membership and permission evaluation to a personable model.
@@ -18,6 +19,13 @@ use JobMetric\Rolix\Models\Role;
  */
 trait HasRole
 {
+    /**
+     * Request-scoped memoization for permission evaluation.
+     *
+     * @var array<string, mixed>
+     */
+    protected array $rolixMemo = [];
+
     /**
      * Check whether the person has a permission, optionally within a memberable context.
      *
@@ -34,19 +42,7 @@ trait HasRole
      */
     public function hasPermission(string $permission, Model $context = null, ?string $collection = null): bool
     {
-        if ($this->hasSuperMembership()) {
-            return true;
-        }
-
-        if ($context !== null && $this->hasOwnerMembership($context, $collection)) {
-            return true;
-        }
-
-        $memberships = $this->validMemberships($context, $collection);
-
-        $roles = $this->extractRolesFromMemberships($memberships)->unique('id');
-
-        $permissions = $this->collectPermissions($memberships, $roles);
+        $permissions = $this->getPermissions($context, $collection);
 
         return $this->evaluatePermissions($permissions, $permission);
     }
@@ -61,18 +57,30 @@ trait HasRole
      */
     public function getPermissions(Model $context = null, ?string $collection = null): array
     {
-        if ($this->hasSuperMembership()) {
-            return ['allow' => ['*'], 'deny' => []];
+        $memoKey = 'permissions:' . $this->rolixScopeKey($context, $collection);
+
+        if (array_key_exists($memoKey, $this->rolixMemo)) {
+            return $this->rolixMemo[$memoKey];
         }
 
-        if ($context !== null && $this->hasOwnerMembership($context, $collection)) {
-            return ['allow' => ['*'], 'deny' => []];
-        }
+        $resolve = function () use ($context, $collection): array {
+            if ($this->hasSuperMembership()) {
+                return ['allow' => ['*'], 'deny' => []];
+            }
 
-        $memberships = $this->validMemberships($context, $collection);
-        $roles = $this->extractRolesFromMemberships($memberships)->unique('id');
+            if ($context !== null && $this->hasOwnerMembership($context, $collection)) {
+                return ['allow' => ['*'], 'deny' => []];
+            }
 
-        return $this->collectPermissions($memberships, $roles);
+            $memberships = $this->validMemberships($context, $collection);
+            $roles = $this->extractRolesFromMemberships($memberships)->unique('id');
+
+            return $this->collectPermissions($memberships, $roles);
+        };
+
+        $result = PermissionCache::remember($this, $memoKey, $resolve);
+
+        return $this->rolixMemo[$memoKey] = $result;
     }
 
     /**
@@ -125,6 +133,8 @@ trait HasRole
 
         $response = MembershipFacade::store($data);
 
+        PermissionCache::forget($this);
+
         return Membership::query()->findOrFail($response->data->id);
     }
 
@@ -161,6 +171,8 @@ trait HasRole
             MembershipFacade::destroy((int) $id);
             $count++;
         }
+
+        PermissionCache::forget($this);
 
         return $count;
     }
@@ -200,6 +212,19 @@ trait HasRole
                 'collection' => $collection,
             ]);
         }
+
+        PermissionCache::forget($this);
+    }
+
+    /**
+     * Clear request-scoped permission memoization for this personable.
+     *
+     * @return void
+     */
+    public function forgetRolixCache(): void
+    {
+        $this->rolixMemo = [];
+        $this->unsetRelation('memberships');
     }
 
     /**
@@ -219,7 +244,13 @@ trait HasRole
      */
     protected function hasSuperMembership(): bool
     {
-        return $this->memberships()->where(function ($q) {
+        $memoKey = 'super';
+
+        if (array_key_exists($memoKey, $this->rolixMemo)) {
+            return (bool) $this->rolixMemo[$memoKey];
+        }
+
+        return $this->rolixMemo[$memoKey] = $this->memberships()->where(function ($q) {
             $q->whereNull('expired_at')->orWhere('expired_at', '>', now());
         })->whereHas('role', function ($q) {
             $q->where('is_super', true);
@@ -236,6 +267,12 @@ trait HasRole
      */
     protected function hasOwnerMembership(Model $context, ?string $collection = null): bool
     {
+        $memoKey = 'owner:' . $this->rolixScopeKey($context, $collection);
+
+        if (array_key_exists($memoKey, $this->rolixMemo)) {
+            return (bool) $this->rolixMemo[$memoKey];
+        }
+
         $query = $this->memberships()
             ->where('memberable_type', $context->getMorphClass())
             ->where('memberable_id', $context->getKey())
@@ -248,7 +285,7 @@ trait HasRole
             $query->where('collection', $collection);
         }
 
-        return $query->exists();
+        return $this->rolixMemo[$memoKey] = $query->exists();
     }
 
     /**
@@ -261,7 +298,13 @@ trait HasRole
      */
     protected function validMemberships(Model $context = null, ?string $collection = null): Collection
     {
-        return $this->memberships()->when($context, function ($query) use ($context) {
+        $memoKey = 'memberships:' . $this->rolixScopeKey($context, $collection);
+
+        if (array_key_exists($memoKey, $this->rolixMemo)) {
+            return $this->rolixMemo[$memoKey];
+        }
+
+        return $this->rolixMemo[$memoKey] = $this->memberships()->when($context, function ($query) use ($context) {
             $query->where('memberable_type', $context->getMorphClass())->where('memberable_id', $context->getKey());
         }, function ($query) {
             $query->whereNull('memberable_type')->whereNull('memberable_id');
@@ -405,5 +448,22 @@ trait HasRole
         }
 
         return false;
+    }
+
+    /**
+     * Build a stable memo/cache scope key for context + collection.
+     *
+     * @param Model|null $context
+     * @param string|null $collection
+     *
+     * @return string
+     */
+    protected function rolixScopeKey(Model $context = null, ?string $collection = null): string
+    {
+        $contextKey = $context === null
+            ? 'system'
+            : $context->getMorphClass() . ':' . $context->getKey();
+
+        return $contextKey . ':' . ($collection ?? '*');
     }
 }

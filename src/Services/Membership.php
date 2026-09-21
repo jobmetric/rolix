@@ -19,6 +19,8 @@ use JobMetric\Rolix\Http\Requests\Membership\UpdateMembershipRequest;
 use JobMetric\Rolix\Http\Resources\MembershipResource;
 use JobMetric\Rolix\Models\Membership as MembershipModel;
 use JobMetric\Rolix\Models\Role as RoleModel;
+use JobMetric\Rolix\Support\ActivityLogger;
+use JobMetric\Rolix\Support\PermissionCache;
 use Throwable;
 
 /**
@@ -209,9 +211,21 @@ class Membership extends AbstractCrudService
             return;
         }
 
-        if (class_exists(\JobMetric\Rolix\Support\ActivityLogger::class)) {
-            \JobMetric\Rolix\Support\ActivityLogger::log($operation, $model, $data);
+        /** @var MembershipModel $model */
+        try {
+            $personable = $model->personable;
+
+            if ($personable instanceof Model) {
+                PermissionCache::forget($personable);
+            }
+            else {
+                PermissionCache::forgetByMorph($model->personable_type, $model->personable_id);
+            }
+        } catch (Throwable) {
+            PermissionCache::forgetByMorph($model->personable_type, $model->personable_id);
         }
+
+        ActivityLogger::log($operation, $model, $data);
     }
 
     /**

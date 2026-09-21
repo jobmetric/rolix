@@ -22,6 +22,7 @@ use JobMetric\Rolix\Models\Role as RoleModel;
 use JobMetric\Rolix\Models\RolePath;
 use JobMetric\Rolix\Models\RoleRule;
 use JobMetric\Rolix\Support\ActivityLogger;
+use JobMetric\Rolix\Support\PermissionCache;
 use Throwable;
 
 /**
@@ -225,6 +226,7 @@ class Role extends AbstractCrudService
     protected function afterCommon(string $operation, Model $model, array $data = []): void
     {
         if (in_array($operation, ['store', 'update', 'destroy'], true)) {
+            PermissionCache::bumpRoles();
             ActivityLogger::log($operation, $model, $data);
         }
     }

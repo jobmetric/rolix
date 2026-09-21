@@ -20,6 +20,24 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Permission Cache
+    |--------------------------------------------------------------------------
+    |
+    | Shared cache for HasRole permission snapshots. Request-scoped memoization
+    | is always active on the model. When enabled, Laravel Cache also stores
+    | allow/deny results with versioned keys invalidated on membership/role
+    | mutations.
+    */
+
+    'cache' => [
+        'enabled' => env('ROLIX_CACHE_ENABLED', true),
+        'ttl' => env('ROLIX_CACHE_TTL', 60),
+        'store' => env('ROLIX_CACHE_STORE', null),
+        'prefix' => env('ROLIX_CACHE_PREFIX', 'rolix'),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Role Types (Registry defaults)
     |--------------------------------------------------------------------------
     |
