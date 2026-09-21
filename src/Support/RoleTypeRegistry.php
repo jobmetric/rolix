@@ -10,6 +10,10 @@ use JobMetric\Rolix\Exceptions\RoleTypeNotFoundException;
  * runtime via register() or via config (rolix.types). Used to validate and
  * list allowed role types.
  *
+ * When a type has no `model` option it behaves as a system type (membership
+ * memberable must be null). When `model` is set, memberships for that type
+ * must target that model.
+ *
  * @package JobMetric\Rolix
  *
  * @property-read array<string, array> $types Map of type name => options (internal state)
@@ -26,8 +30,8 @@ class RoleTypeRegistry
     /**
      * Register a role type, or merge options for an existing type.
      *
-     * @param string $type   Role type name (e.g. department, tenant).
-     * @param array $options Optional options (e.g. label, description, hierarchical).
+     * @param string $type   Role type name (e.g. department, tenant, system).
+     * @param array $options Optional options (e.g. label, description, hierarchical, model).
      *
      * @return self
      */
@@ -100,7 +104,7 @@ class RoleTypeRegistry
      * Get a single option for a registered type.
      *
      * @param string $type   Role type name.
-     * @param string $key    Option key (e.g. label, hierarchical).
+     * @param string $key    Option key (e.g. label, hierarchical, model).
      * @param mixed $default Value when key is missing.
      *
      * @return mixed
@@ -108,6 +112,32 @@ class RoleTypeRegistry
     public function getOption(string $type, string $key, mixed $default = null): mixed
     {
         return Arr::get($this->types[$type] ?? [], $key, $default);
+    }
+
+    /**
+     * Get the model class bound to a role type, if any.
+     *
+     * @param string $type Role type name.
+     *
+     * @return string|null Fully-qualified model class, or null for system types.
+     */
+    public function getModel(string $type): ?string
+    {
+        $model = $this->getOption($type, 'model');
+
+        return is_string($model) && $model !== '' ? $model : null;
+    }
+
+    /**
+     * Whether the role type is system-scoped (no model option).
+     *
+     * @param string $type Role type name.
+     *
+     * @return bool
+     */
+    public function isSystem(string $type): bool
+    {
+        return $this->getModel($type) === null;
     }
 
     /**

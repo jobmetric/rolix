@@ -2,8 +2,15 @@
 
 namespace JobMetric\Rolix\Services;
 
+use JobMetric\Rolix\Exceptions\RoleTypeNotFoundException;
+use JobMetric\Rolix\Facades\RoleTypeRegistry;
 use JobMetric\Rolix\Models\Role;
 
+/**
+ * Manages role creation and related operations.
+ *
+ * @package JobMetric\Rolix
+ */
 class RoleManager
 {
     /**
@@ -15,9 +22,13 @@ class RoleManager
      */
     public function create(array $data): Role
     {
+        $type = $data['type'] ?? 'system';
+
+        RoleTypeRegistry::ensure($type);
+
         $role = new Role;
 
-        $role->type = $data['type'] ?? null;
+        $role->type = $type;
         $role->parent_id = $data['parent_id'] ?? null;
         $role->name = $data['name'];
         $role->description = $data['description'] ?? null;
@@ -29,7 +40,6 @@ class RoleManager
         $role->save();
 
         // add role path
-
 
         return $role;
     }

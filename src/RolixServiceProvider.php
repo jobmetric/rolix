@@ -66,10 +66,8 @@ class RolixServiceProvider extends PackageCoreServiceProvider
             $event = new RegisterPathPermissionEvent;
             event($event);
 
-            if (!empty($event->getPaths())) {
-                foreach ($event->getPaths() as $context => $path) {
-                    Permission::addPermissionFile($context, $path);
-                }
+            foreach ($event->getPaths() as [$context, $path, $model]) {
+                Permission::addPermissionFile($context, $path, $model);
             }
         });
     }

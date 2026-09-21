@@ -20,7 +20,7 @@ class RoleFactory extends Factory
     public function definition(): array
     {
         return [
-            'type' => null,
+            'type' => 'system',
             'parent_id' => null,
             'name' => $this->faker->unique()->word,
             'description' => $this->faker->sentence,

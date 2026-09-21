@@ -8,14 +8,14 @@ use JobMetric\Rolix\Services\PermissionManager;
 /**
  * @mixin PermissionManager
  *
- * @method static void addPermissionFile(string $context, string $path)
- * @method static array getPermissions(string $context = null, string $view = 'assoc')
- * @method static bool hasPermission(string $context, string $permission)
- * @method static array getContextPermission()
- * @method static array getFlatPermissions(string $context = null)
- * @method static array getLangPermissions(string $context = null)
- * @method static array getFlatLangPermissions(string $context = null)
- * @method static array getAssocPermissions(string $context = null)
+ * @method static void addPermissionFile(string $context, string $path, string|null $model = null)
+ * @method static array getPermissions(string|null $context = null, string $view = 'assoc', string|null $model = null)
+ * @method static bool hasPermission(string $context, string $permission, string|null $model = null)
+ * @method static array getContextPermission(string|null $model = null)
+ * @method static array getFlatPermissions(string|null $context = null, string|null $model = null)
+ * @method static array getLangPermissions(string|null $context = null, string|null $model = null)
+ * @method static array getFlatLangPermissions(string|null $context = null, string|null $model = null)
+ * @method static array getAssocPermissions(string|null $context = null, string|null $model = null)
  */
 class Permission extends Facade
 {

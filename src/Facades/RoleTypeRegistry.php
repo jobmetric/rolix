@@ -14,6 +14,8 @@ use Illuminate\Support\Facades\Facade;
  * @method static array<string, mixed> all()
  * @method static array<int, string> values()
  * @method static mixed getOption(string $type, string $key, mixed $default = null)
+ * @method static string|null getModel(string $type)
+ * @method static bool isSystem(string $type)
  * @method static \JobMetric\Rolix\Support\RoleTypeRegistry ensure(string $type)
  * @method static \JobMetric\Rolix\Support\RoleTypeRegistry clear()
  */

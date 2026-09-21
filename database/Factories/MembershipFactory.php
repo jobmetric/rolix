@@ -67,6 +67,19 @@ class MembershipFactory extends Factory
     }
 
     /**
+     * System-wide membership (memberable is null).
+     *
+     * @return static
+     */
+    public function system(): static
+    {
+        return $this->state(fn(array $attributes) => [
+            'memberable_type' => null,
+            'memberable_id' => null,
+        ]);
+    }
+
+    /**
      * set role_id
      *
      * @param int $role_id

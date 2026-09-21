@@ -31,9 +31,15 @@ return [
     | - label: translation key for the type label
     | - description: translation key for the type description
     | - hierarchical: whether roles of this type form a parent/child tree
+    | - model: FQCN of the memberable model; omit for system-wide roles
     */
 
     'types' => [
+        'system' => [
+            'label' => 'rolix::base.types.system.label',
+            'description' => 'rolix::base.types.system.description',
+            'hierarchical' => false,
+        ],
         // 'department' => [
         //     'label' => 'rolix::base.types.department.label',
         //     'description' => 'rolix::base.types.department.description',

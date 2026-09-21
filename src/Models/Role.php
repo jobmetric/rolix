@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use JobMetric\Rolix\Factories\RoleFactory;
 
 /**
  * JobMetric\Rolix\Models\Role
@@ -50,17 +51,27 @@ class Role extends Model
      * @var array<string, string>
      */
     protected $casts = [
-        'type' => 'string',
-        'parent_id' => 'integer',
-        'name' => 'string',
+        'type'        => 'string',
+        'parent_id'   => 'integer',
+        'name'        => 'string',
         'description' => 'string',
-        'allow' => 'array',
-        'deny' => 'array',
-        'is_default' => 'boolean',
-        'ordering' => 'integer',
-        'created_at' => 'datetime',
-        'updated_at' => 'datetime'
+        'allow'       => 'array',
+        'deny'        => 'array',
+        'is_default'  => 'boolean',
+        'ordering'    => 'integer',
+        'created_at'  => 'datetime',
+        'updated_at'  => 'datetime',
     ];
+
+    /**
+     * Create a new factory instance for the model.
+     *
+     * @return RoleFactory
+     */
+    protected static function newFactory(): RoleFactory
+    {
+        return RoleFactory::new();
+    }
 
     public function getTable()
     {

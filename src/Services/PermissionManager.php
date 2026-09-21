@@ -4,76 +4,100 @@ namespace JobMetric\Rolix\Services;
 
 use InvalidArgumentException;
 
+/**
+ * Loads and serves permission definitions grouped by context and optional model.
+ *
+ * When model is omitted, permissions are stored under the system sentinel key
+ * and apply system-wide.
+ *
+ * @package JobMetric\Rolix
+ */
 class PermissionManager
 {
+    /**
+     * Sentinel key used when no model is provided (system-wide permissions).
+     */
+    public const SYSTEM_MODEL_KEY = '__system__';
+
+    /**
+     * Nested permissions: modelKey => context => list of perm/lang pairs.
+     *
+     * @var array<string, array<string, array<int, array{perm: string, lang: string}>>>
+     */
     protected array $permissions = [];
 
     /**
-     * Add a permission file path
+     * Add a permission file path for a context and optional model.
      *
      * @param string $context
      * @param string $path
+     * @param string|null $model Fully-qualified model class, or null for system-wide.
      *
      * @return void
+     * @throws InvalidArgumentException
      */
-    public function addPermissionFile(string $context, string $path): void
+    public function addPermissionFile(string $context, string $path, ?string $model = null): void
     {
-        if (file_exists($path)) {
-            $permissions = require $path;
-
-            // check flat array
-            if (is_array($permissions)) {
-                foreach ($permissions as $permission => $permission_lang) {
-                    if (is_string($permission) && is_string($permission_lang)) {
-                        $this->permissions[$context][] = [
-                            'perm' => $permission,
-                            'lang' => $permission_lang
-                        ];
-                    } else {
-                        throw new InvalidArgumentException("Invalid permission format in file: {$path}");
-                    }
-                }
-            } else {
-                throw new InvalidArgumentException("Permission file is not an array: {$path}");
-            }
-        } else {
+        if (! file_exists($path)) {
             throw new InvalidArgumentException("Permission file does not exist: {$path}");
+        }
+
+        $permissions = require $path;
+
+        if (! is_array($permissions)) {
+            throw new InvalidArgumentException("Permission file is not an array: {$path}");
+        }
+
+        $modelKey = $this->resolveModelKey($model);
+
+        foreach ($permissions as $permission => $permission_lang) {
+            if (! is_string($permission) || ! is_string($permission_lang)) {
+                throw new InvalidArgumentException("Invalid permission format in file: {$path}");
+            }
+
+            $this->permissions[$modelKey][$context][] = [
+                'perm' => $permission,
+                'lang' => $permission_lang,
+            ];
         }
     }
 
     /**
-     * Get all permissions for a specific context
+     * Get all permissions for a specific context and optional model.
      *
      * @param string|null $context
      * @param string $view
+     * @param string|null $model
      *
      * @return array
      */
-    public function getPermissions(string $context = null, string $view = 'assoc'): array
+    public function getPermissions(string $context = null, string $view = 'assoc', ?string $model = null): array
     {
         return match ($view) {
-            'flat' => $this->getFlatPermissions($context),
-            'lang' => $this->getLangPermissions($context),
-            'flat_lang' => $this->getFlatLangPermissions($context),
-            default => $this->getAssocPermissions($context),
+            'flat' => $this->getFlatPermissions($context, $model),
+            'lang' => $this->getLangPermissions($context, $model),
+            'flat_lang' => $this->getFlatLangPermissions($context, $model),
+            default => $this->getAssocPermissions($context, $model),
         };
     }
 
     /**
-     * Check if a permission exists for a specific context
+     * Check if a permission exists for a specific context and optional model.
      *
      * @param string $context
      * @param string $permission
+     * @param string|null $model
      *
      * @return bool
      */
-    public function hasPermission(string $context, string $permission): bool
+    public function hasPermission(string $context, string $permission, ?string $model = null): bool
     {
-        if (isset($this->permissions[$context])) {
-            foreach ($this->permissions[$context] as $perm) {
-                if ($perm['perm'] === $permission) {
-                    return true;
-                }
+        $modelKey = $this->resolveModelKey($model);
+        $items = $this->permissions[$modelKey][$context] ?? [];
+
+        foreach ($items as $perm) {
+            if ($perm['perm'] === $permission) {
+                return true;
             }
         }
 
@@ -81,96 +105,137 @@ class PermissionManager
     }
 
     /**
-     * Get all context permission
+     * Get all context names for an optional model scope.
+     *
+     * @param string|null $model
      *
      * @return array
      */
-    public function getContextPermission(): array
+    public function getContextPermission(?string $model = null): array
     {
-        return array_keys($this->permissions);
+        $modelKey = $this->resolveModelKey($model);
+
+        return array_keys($this->permissions[$modelKey] ?? []);
     }
 
     /**
-     * Get all permissions in associative format
+     * Get all permissions in flat format.
      *
      * @param string|null $context
+     * @param string|null $model
      *
      * @return array
      */
-    public function getFlatPermissions(string $context = null): array
+    public function getFlatPermissions(string $context = null, ?string $model = null): array
     {
+        $bucket = $this->bucketFor($model);
+
         if ($context) {
-            return array_map(function ($perm) {
-                return $perm['perm'];
-            }, $this->permissions[$context] ?? []);
-        } else {
-            return array_merge(...array_map(function ($permissions) {
-                return array_map(function ($perm) {
-                    return $perm['perm'];
-                }, $permissions);
-            }, $this->permissions));
+            return array_map(fn ($perm) => $perm['perm'], $bucket[$context] ?? []);
         }
-    }
 
-    /**
-     * Get all permissions in language format
-     *
-     * @param string|null $context
-     *
-     * @return array
-     */
-    public function getLangPermissions(string $context = null): array
-    {
-        if ($context) {
-            return array_map(function ($perm) {
-                return $perm['lang'];
-            }, $this->permissions[$context] ?? []);
-        } else {
-            return array_merge(...array_map(function ($permissions) {
-                return array_map(function ($perm) {
-                    return $perm['lang'];
-                }, $permissions);
-            }, $this->permissions));
+        if ($bucket === []) {
+            return [];
         }
+
+        return array_merge(...array_map(function ($permissions) {
+            return array_map(fn ($perm) => $perm['perm'], $permissions);
+        }, $bucket));
     }
 
     /**
-     * Get all permissions in flat language format
+     * Get all permissions in language format.
      *
      * @param string|null $context
+     * @param string|null $model
      *
      * @return array
      */
-    public function getFlatLangPermissions(string $context = null): array
+    public function getLangPermissions(string $context = null, ?string $model = null): array
     {
+        $bucket = $this->bucketFor($model);
+
         if ($context) {
-            return $this->permissions[$context] ?? [];
-        } else {
-            return $this->permissions;
+            return array_map(fn ($perm) => $perm['lang'], $bucket[$context] ?? []);
         }
+
+        if ($bucket === []) {
+            return [];
+        }
+
+        return array_merge(...array_map(function ($permissions) {
+            return array_map(fn ($perm) => $perm['lang'], $permissions);
+        }, $bucket));
     }
 
     /**
-     * Get all permissions in associative format
+     * Get all permissions in flat language format.
      *
      * @param string|null $context
+     * @param string|null $model
      *
      * @return array
      */
-    public function getAssocPermissions(string $context = null): array
+    public function getFlatLangPermissions(string $context = null, ?string $model = null): array
     {
+        $bucket = $this->bucketFor($model);
+
         if ($context) {
-            return array_reduce($this->permissions[$context] ?? [], function ($carry, $perm) {
+            return $bucket[$context] ?? [];
+        }
+
+        return $bucket;
+    }
+
+    /**
+     * Get all permissions in associative format.
+     *
+     * @param string|null $context
+     * @param string|null $model
+     *
+     * @return array
+     */
+    public function getAssocPermissions(string $context = null, ?string $model = null): array
+    {
+        $bucket = $this->bucketFor($model);
+
+        if ($context) {
+            return array_reduce($bucket[$context] ?? [], function ($carry, $perm) {
                 $carry[$perm['perm']] = $perm['lang'];
+
                 return $carry;
             }, []);
-        } else {
-            $permissions = [];
-            foreach ($this->permissions as $index => $perms) {
-                $permissions[$index] = $this->getAssocPermissions($index);
-            }
-
-            return $permissions;
         }
+
+        $permissions = [];
+        foreach (array_keys($bucket) as $index) {
+            $permissions[$index] = $this->getAssocPermissions($index, $model);
+        }
+
+        return $permissions;
+    }
+
+    /**
+     * Resolve storage key for a model scope.
+     *
+     * @param string|null $model
+     *
+     * @return string
+     */
+    protected function resolveModelKey(?string $model): string
+    {
+        return $model === null || $model === '' ? self::SYSTEM_MODEL_KEY : $model;
+    }
+
+    /**
+     * Get the permission bucket for a model scope.
+     *
+     * @param string|null $model
+     *
+     * @return array<string, array<int, array{perm: string, lang: string}>>
+     */
+    protected function bucketFor(?string $model): array
+    {
+        return $this->permissions[$this->resolveModelKey($model)] ?? [];
     }
 }
