@@ -24,6 +24,25 @@ class RolixServiceProviderTest extends TestCase
     }
 
     /**
+     * Flatten named permission contexts without treating their keys as PHP named arguments.
+     */
+    public function test_permission_manager_flattens_named_contexts(): void
+    {
+        $path = tempnam(sys_get_temp_dir(), 'rolix-permissions-');
+        file_put_contents($path, "<?php return ['admin' => 'permissions.admin'];");
+
+        try {
+            $manager = new PermissionManager;
+            $manager->addPermissionFile('system', $path);
+
+            $this->assertSame(['admin'], $manager->getFlatPermissions());
+            $this->assertSame(['permissions.admin'], $manager->getLangPermissions());
+        } finally {
+            unlink($path);
+        }
+    }
+
+    /**
      * RoleTypeRegistry is resolvable from container.
      */
     public function test_role_type_registry_is_resolvable(): void

@@ -2,6 +2,10 @@
 
 All notable changes to `jobmetric/rolix` are documented here.
 
+## 1.1.1 - 2026-09-22
+
+- Fix flattening permission and language lists from named contexts on PHP 8.
+
 ## 1.1.0 - 2026-09-22
 
 - Add hierarchical role trees with closure-table path maintenance.

@@ -143,7 +143,7 @@ class PermissionManager
 
         return array_merge(...array_map(function ($permissions) {
             return array_map(fn ($perm) => $perm['perm'], $permissions);
-        }, $bucket));
+        }, array_values($bucket)));
     }
 
     /**
@@ -168,7 +168,7 @@ class PermissionManager
 
         return array_merge(...array_map(function ($permissions) {
             return array_map(fn ($perm) => $perm['lang'], $permissions);
-        }, $bucket));
+        }, array_values($bucket)));
     }
 
     /**
