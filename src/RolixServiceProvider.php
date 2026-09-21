@@ -9,7 +9,9 @@ use JobMetric\PackageCore\PackageCore;
 use JobMetric\PackageCore\PackageCoreServiceProvider;
 use JobMetric\Rolix\Events\RegisterPathPermissionEvent;
 use JobMetric\Rolix\Facades\Permission;
+use JobMetric\Rolix\Facades\RoleTypeRegistry as FacadeRoleTypeRegistry;
 use JobMetric\Rolix\Services\PermissionManager;
+use JobMetric\Rolix\Support\RoleTypeRegistry;
 
 class RolixServiceProvider extends PackageCoreServiceProvider
 {
@@ -27,7 +29,20 @@ class RolixServiceProvider extends PackageCoreServiceProvider
             ->hasMigration()
             ->hasTranslation()
             ->registerClass('rolix.permission', PermissionManager::class, RegisterClassTypeEnum::SINGLETON())
-            ->registerClass('RoleType', RoleType::class, RegisterClassTypeEnum::SINGLETON());
+            ->registerClass('RoleTypeRegistry', RoleTypeRegistry::class, RegisterClassTypeEnum::SINGLETON());
+    }
+
+    /**
+     * After register package
+     *
+     * @return void
+     */
+    public function afterRegisterPackage(): void
+    {
+        // Register role types from config
+        foreach (config('rolix.types', []) as $type => $options) {
+            FacadeRoleTypeRegistry::register($type, is_array($options) ? $options : []);
+        }
     }
 
     /**

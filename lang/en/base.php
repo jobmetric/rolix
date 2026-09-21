@@ -12,4 +12,8 @@ return [
     |
     */
 
+    'exceptions' => [
+        'role_type_not_found' => 'The :type role type is not registered.',
+    ],
+
 ];

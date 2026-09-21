@@ -12,4 +12,8 @@ return [
     |
     */
 
+    'exceptions' => [
+        'role_type_not_found' => 'نوع نقش :type ثبت نشده است.',
+    ],
+
 ];
