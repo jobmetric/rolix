@@ -3,6 +3,8 @@
 namespace JobMetric\Rolix\Events;
 
 use InvalidArgumentException;
+use JobMetric\EventSystem\Contracts\DomainEvent;
+use JobMetric\EventSystem\Support\DomainEventDefinition;
 use JobMetric\Rolix\Services\PermissionManager;
 
 /**
@@ -10,7 +12,7 @@ use JobMetric\Rolix\Services\PermissionManager;
  *
  * @package JobMetric\Rolix
  */
-class RegisterPathPermissionEvent
+class RegisterPathPermissionEvent implements DomainEvent
 {
     /**
      * The paths to register permissions: modelKey => context => path.
@@ -19,44 +21,45 @@ class RegisterPathPermissionEvent
      */
     private array $paths;
 
-    /**
-     * Create a new event instance.
-     */
     public function __construct()
     {
         $this->paths = [];
     }
 
+    public static function key(): string
+    {
+        return 'permission.paths_registering';
+    }
+
+    public static function definition(): DomainEventDefinition
+    {
+        return new DomainEventDefinition(self::key(), 'rolix::base.events.permission.group', 'rolix::base.events.permission.paths_registering.title', 'rolix::base.events.permission.paths_registering.description', 'fas fa-folder-open', [
+            'permission',
+            'registration',
+            'management',
+        ]);
+    }
+
     /**
-     * Add a path to the event.
-     *
      * @param string $context
      * @param string $path
-     * @param string|null $model Fully-qualified model class, or null for system-wide.
+     * @param string|null $model
      *
      * @return void
      * @throws InvalidArgumentException
      */
     public function addPath(string $context, string $path, ?string $model = null): void
     {
-        $modelKey = $model === null || $model === ''
-            ? PermissionManager::SYSTEM_MODEL_KEY
-            : $model;
+        $modelKey = $model === null || $model === '' ? PermissionManager::SYSTEM_MODEL_KEY : $model;
 
         if (isset($this->paths[$modelKey][$context])) {
-            throw new InvalidArgumentException(
-                "Path for context '{$context}' and model '{$modelKey}' is already registered."
-            );
+            throw new InvalidArgumentException("Path for context '{$context}' and model '{$modelKey}' is already registered.");
         }
 
         $this->paths[$modelKey][$context] = $path;
     }
 
     /**
-     * Get the paths registered in the event.
-     *
-     * Flat map of entries: each item is [context, path, model|null].
-     *
      * @return array<int, array{0: string, 1: string, 2: string|null}>
      */
     public function getPaths(): array

@@ -6,6 +6,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Schema;
 use JobMetric\CustomField\CustomFieldServiceProvider;
+use JobMetric\EventSystem\EventSystemServiceProvider;
 use JobMetric\Form\FormServiceProvider;
 use JobMetric\Rolix\RolixServiceProvider;
 use Orchestra\Testbench\TestCase as BaseTestCase;
@@ -25,6 +26,7 @@ abstract class TestCase extends BaseTestCase
         return [
             CustomFieldServiceProvider::class,
             FormServiceProvider::class,
+            EventSystemServiceProvider::class,
             RolixServiceProvider::class,
         ];
     }

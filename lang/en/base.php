@@ -180,4 +180,79 @@ return [
         ],
     ],
 
+    'events' => [
+        'role' => [
+            'group' => 'Role',
+            'stored' => [
+                'title' => 'Role Stored',
+                'description' => 'This event is triggered when a role is stored.',
+            ],
+            'updated' => [
+                'title' => 'Role Updated',
+                'description' => 'This event is triggered when a role is updated.',
+            ],
+            'deleted' => [
+                'title' => 'Role Deleted',
+                'description' => 'This event is triggered when a role is deleted.',
+            ],
+        ],
+        'membership' => [
+            'group' => 'Membership',
+            'stored' => [
+                'title' => 'Membership Stored',
+                'description' => 'This event is triggered when a membership is stored.',
+            ],
+            'updated' => [
+                'title' => 'Membership Updated',
+                'description' => 'This event is triggered when a membership is updated.',
+            ],
+            'deleted' => [
+                'title' => 'Membership Deleted',
+                'description' => 'This event is triggered when a membership is deleted.',
+            ],
+            'restored' => [
+                'title' => 'Membership Restored',
+                'description' => 'This event is triggered when a membership is restored.',
+            ],
+            'force_deleted' => [
+                'title' => 'Membership Force Deleted',
+                'description' => 'This event is triggered when a membership is permanently deleted.',
+            ],
+        ],
+        'permission' => [
+            'group' => 'Permission',
+            'paths_registering' => [
+                'title' => 'Permission Paths Registering',
+                'description' => 'This event collects permission file paths before they are loaded.',
+            ],
+        ],
+        'resource' => [
+            'group' => 'Resource',
+            'personable' => [
+                'title' => 'Personable Resource',
+                'description' => 'This event resolves the API resource for a personable model.',
+            ],
+            'memberable' => [
+                'title' => 'Memberable Resource',
+                'description' => 'This event resolves the API resource for a memberable model.',
+            ],
+            'actor' => [
+                'title' => 'Actor Resource',
+                'description' => 'This event resolves the API resource for an activity actor.',
+            ],
+            'target' => [
+                'title' => 'Target Resource',
+                'description' => 'This event resolves the API resource for an activity target.',
+            ],
+            'context' => [
+                'title' => 'Context Resource',
+                'description' => 'This event resolves the API resource for an activity context.',
+            ],
+            'subject' => [
+                'title' => 'Subject Resource',
+                'description' => 'This event resolves the API resource for an activity subject.',
+            ],
+        ],
+    ],
+
 ];

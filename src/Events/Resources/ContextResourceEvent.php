@@ -2,30 +2,41 @@
 
 namespace JobMetric\Rolix\Events\Resources;
 
-class ContextResourceEvent
+use JobMetric\EventSystem\Contracts\DomainEvent;
+use JobMetric\EventSystem\Support\DomainEventDefinition;
+
+class ContextResourceEvent implements DomainEvent
 {
     /**
-     * The context model instance.
-     *
      * @var mixed
      */
     public mixed $context;
 
     /**
-     * The resource to be filled by the listener.
-     *
      * @var mixed|null
      */
     public mixed $resource;
 
     /**
-     * Create a new event instance.
-     *
      * @param mixed $context
      */
     public function __construct(mixed $context)
     {
         $this->context = $context;
         $this->resource = null;
+    }
+
+    public static function key(): string
+    {
+        return 'resource.context';
+    }
+
+    public static function definition(): DomainEventDefinition
+    {
+        return new DomainEventDefinition(self::key(), 'rolix::base.events.resource.group', 'rolix::base.events.resource.context.title', 'rolix::base.events.resource.context.description', 'fas fa-sitemap', [
+            'resource',
+            'context',
+            'api',
+        ]);
     }
 }

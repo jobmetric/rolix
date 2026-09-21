@@ -2,30 +2,41 @@
 
 namespace JobMetric\Rolix\Events\Resources;
 
-class SubjectResourceEvent
+use JobMetric\EventSystem\Contracts\DomainEvent;
+use JobMetric\EventSystem\Support\DomainEventDefinition;
+
+class SubjectResourceEvent implements DomainEvent
 {
     /**
-     * The subject model instance.
-     *
      * @var mixed
      */
     public mixed $subject;
 
     /**
-     * The resource to be filled by the listener.
-     *
      * @var mixed|null
      */
     public mixed $resource;
 
     /**
-     * Create a new event instance.
-     *
      * @param mixed $subject
      */
     public function __construct(mixed $subject)
     {
         $this->subject = $subject;
         $this->resource = null;
+    }
+
+    public static function key(): string
+    {
+        return 'resource.subject';
+    }
+
+    public static function definition(): DomainEventDefinition
+    {
+        return new DomainEventDefinition(self::key(), 'rolix::base.events.resource.group', 'rolix::base.events.resource.subject.title', 'rolix::base.events.resource.subject.description', 'fas fa-cube', [
+            'resource',
+            'subject',
+            'api',
+        ]);
     }
 }

@@ -2,30 +2,41 @@
 
 namespace JobMetric\Rolix\Events\Resources;
 
-class TargetResourceEvent
+use JobMetric\EventSystem\Contracts\DomainEvent;
+use JobMetric\EventSystem\Support\DomainEventDefinition;
+
+class TargetResourceEvent implements DomainEvent
 {
     /**
-     * The target model instance.
-     *
      * @var mixed
      */
     public mixed $target;
 
     /**
-     * The resource to be filled by the listener.
-     *
      * @var mixed|null
      */
     public mixed $resource;
 
     /**
-     * Create a new event instance.
-     *
      * @param mixed $target
      */
     public function __construct(mixed $target)
     {
         $this->target = $target;
         $this->resource = null;
+    }
+
+    public static function key(): string
+    {
+        return 'resource.target';
+    }
+
+    public static function definition(): DomainEventDefinition
+    {
+        return new DomainEventDefinition(self::key(), 'rolix::base.events.resource.group', 'rolix::base.events.resource.target.title', 'rolix::base.events.resource.target.description', 'fas fa-bullseye', [
+            'resource',
+            'target',
+            'api',
+        ]);
     }
 }

@@ -2,16 +2,13 @@
 
 namespace JobMetric\Rolix\Events\Membership;
 
+use JobMetric\EventSystem\Contracts\DomainEvent;
+use JobMetric\EventSystem\Support\DomainEventDefinition;
 use JobMetric\Rolix\Models\Membership;
 
-/**
- * Dispatched after a membership is updated.
- */
-class MembershipUpdateEvent
+readonly class MembershipUpdateEvent implements DomainEvent
 {
     /**
-     * Create a new event instance.
-     *
      * @param Membership $membership
      * @param array<string, mixed> $data
      */
@@ -19,5 +16,19 @@ class MembershipUpdateEvent
         public Membership $membership,
         public array $data = []
     ) {
+    }
+
+    public static function key(): string
+    {
+        return 'membership.updated';
+    }
+
+    public static function definition(): DomainEventDefinition
+    {
+        return new DomainEventDefinition(self::key(), 'rolix::base.events.membership.group', 'rolix::base.events.membership.updated.title', 'rolix::base.events.membership.updated.description', 'fas fa-user-edit', [
+            'membership',
+            'storage',
+            'management',
+        ]);
     }
 }
