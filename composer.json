@@ -47,6 +47,7 @@
             ],
             "aliases": {
                 "Role": "JobMetric\\Rolix\\Facades\\Role",
+                "Membership": "JobMetric\\Rolix\\Facades\\Membership",
                 "Permission": "JobMetric\\Rolix\\Facades\\Permission",
                 "RoleTypeRegistry": "JobMetric\\Rolix\\Facades\\RoleTypeRegistry",
                 "RuleEvaluatorRegistry": "JobMetric\\Rolix\\Facades\\RuleEvaluatorRegistry"

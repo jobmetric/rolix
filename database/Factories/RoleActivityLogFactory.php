@@ -34,17 +34,18 @@ class RoleActivityLogFactory extends Factory
 
         return [
             'action' => $this->faker->randomElement($actions),
-            'actor_type' => null,
-            'actor_id' => null,
-            'target_type' => null,
-            'target_id' => null,
+            'actor_type' => 'system',
+            'actor_id' => 0,
+            'target_type' => 'system',
+            'target_id' => 0,
             'context_type' => null,
             'context_id' => null,
-            'subject_type' => null,
-            'subject_id' => null,
+            'subject_type' => 'system',
+            'subject_id' => 0,
             'reason' => $this->faker->optional()->sentence(),
             'ip_address' => $this->faker->optional()->ipv4(),
             'user_agent' => $this->faker->optional()->userAgent(),
+            'performed_at' => now(),
         ];
     }
 

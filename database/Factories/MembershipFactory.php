@@ -27,8 +27,8 @@ class MembershipFactory extends Factory
             'memberable_id' => null,
             'role_id' => null,
             'collection' => $this->faker->word,
-            'is_owner' => $this->faker->boolean,
-            'expired_at' => $this->faker->optional()->dateTimeBetween('now', '+1 year'),
+            'is_owner' => false,
+            'expired_at' => null,
             'allow' => [],
             'deny' => [],
         ];

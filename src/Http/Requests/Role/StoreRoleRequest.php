@@ -100,6 +100,12 @@ class StoreRoleRequest extends FormRequest
             return;
         }
 
+        if (RoleTypeRegistry::getOption($type, 'hierarchical', true) === false) {
+            $v->errors()->add('parent_id', trans('rolix::base.validation.role.parent_not_allowed'));
+
+            return;
+        }
+
         $parent = Role::query()->find($data['parent_id']);
 
         if ($parent === null) {

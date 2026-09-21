@@ -15,8 +15,11 @@ class MembershipMemberableMismatchException extends Exception
      * @param int $code
      * @param Throwable|null $previous
      */
-    public function __construct(string $message = 'membership_memberable_mismatch', int $code = 400, ?Throwable $previous = null)
-    {
+    public function __construct(
+        string $message = 'membership_memberable_mismatch',
+        int $code = 400,
+        ?Throwable $previous = null
+    ) {
         parent::__construct(trans('rolix::base.exceptions.' . $message), $code, $previous);
     }
 }

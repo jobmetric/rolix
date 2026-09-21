@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Support\Collection;
 use JobMetric\Rolix\Contracts\RuleEvaluatorContract;
+use JobMetric\Rolix\Facades\Membership as MembershipFacade;
 use JobMetric\Rolix\Facades\RuleEvaluatorRegistry;
 use JobMetric\Rolix\Models\Membership;
 use JobMetric\Rolix\Models\Role;
@@ -21,27 +22,184 @@ trait HasRole
      * Check whether the person has a permission, optionally within a memberable context.
      *
      * Super membership grants all permissions regardless of context.
+     * Owner membership grants all permissions for that memberable context only.
      * Without context, only system memberships (null memberable) apply.
      * With context, only memberships for that entity apply.
      *
      * @param string $permission
      * @param Model|null $context
+     * @param string|null $collection
      *
      * @return bool
      */
-    public function hasPermission(string $permission, Model $context = null): bool
+    public function hasPermission(string $permission, Model $context = null, ?string $collection = null): bool
     {
         if ($this->hasSuperMembership()) {
             return true;
         }
 
-        $memberships = $this->validMemberships($context);
+        if ($context !== null && $this->hasOwnerMembership($context, $collection)) {
+            return true;
+        }
+
+        $memberships = $this->validMemberships($context, $collection);
 
         $roles = $this->extractRolesFromMemberships($memberships)->unique('id');
 
         $permissions = $this->collectPermissions($memberships, $roles);
 
         return $this->evaluatePermissions($permissions, $permission);
+    }
+
+    /**
+     * Effective allow/deny permission lists for the given scope.
+     *
+     * @param Model|null $context
+     * @param string|null $collection
+     *
+     * @return array{allow: array<int, string>, deny: array<int, string>}
+     */
+    public function getPermissions(Model $context = null, ?string $collection = null): array
+    {
+        if ($this->hasSuperMembership()) {
+            return ['allow' => ['*'], 'deny' => []];
+        }
+
+        if ($context !== null && $this->hasOwnerMembership($context, $collection)) {
+            return ['allow' => ['*'], 'deny' => []];
+        }
+
+        $memberships = $this->validMemberships($context, $collection);
+        $roles = $this->extractRolesFromMemberships($memberships)->unique('id');
+
+        return $this->collectPermissions($memberships, $roles);
+    }
+
+    /**
+     * Whether the person has the given role in scope.
+     *
+     * @param Role|int|string $role Role model, id, or name
+     * @param Model|null $context
+     * @param string|null $collection
+     *
+     * @return bool
+     */
+    public function hasRole(Role|int|string $role, Model $context = null, ?string $collection = null): bool
+    {
+        $memberships = $this->validMemberships($context, $collection);
+        $roleIds = $memberships->pluck('role_id')->filter()->map(fn ($id) => (int) $id);
+
+        if ($role instanceof Role) {
+            return $roleIds->contains((int) $role->id);
+        }
+
+        if (is_int($role) || ctype_digit((string) $role)) {
+            return $roleIds->contains((int) $role);
+        }
+
+        $matched = Role::query()->whereIn('id', $roleIds->all())->where('name', $role)->exists();
+
+        return $matched;
+    }
+
+    /**
+     * Assign a role membership via the Membership service.
+     *
+     * @param Role|int $role
+     * @param Model|null $context
+     * @param array<string, mixed> $attributes
+     *
+     * @return Membership
+     */
+    public function assignRole(Role|int $role, Model $context = null, array $attributes = []): Membership
+    {
+        $roleId = $role instanceof Role ? $role->id : $role;
+
+        $data = array_merge([
+            'personable_type' => $this->getMorphClass(),
+            'personable_id'   => $this->getKey(),
+            'role_id'         => $roleId,
+            'memberable_type' => $context?->getMorphClass(),
+            'memberable_id'   => $context?->getKey(),
+        ], $attributes);
+
+        $response = MembershipFacade::store($data);
+
+        return Membership::query()->findOrFail($response->data->id);
+    }
+
+    /**
+     * Soft-delete memberships matching the role in scope.
+     *
+     * @param Role|int $role
+     * @param Model|null $context
+     * @param string|null $collection
+     *
+     * @return int Number of removed memberships
+     */
+    public function removeRole(Role|int $role, Model $context = null, ?string $collection = null): int
+    {
+        $roleId = $role instanceof Role ? $role->id : $role;
+
+        $query = $this->memberships()->where('role_id', $roleId);
+
+        if ($context) {
+            $query->where('memberable_type', $context->getMorphClass())->where('memberable_id', $context->getKey());
+        }
+        else {
+            $query->whereNull('memberable_type')->whereNull('memberable_id');
+        }
+
+        if ($collection !== null) {
+            $query->where('collection', $collection);
+        }
+
+        $ids = $query->pluck('id');
+        $count = 0;
+
+        foreach ($ids as $id) {
+            MembershipFacade::destroy((int) $id);
+            $count++;
+        }
+
+        return $count;
+    }
+
+    /**
+     * Replace all memberships in scope with the given role ids.
+     *
+     * @param array<int, Role|int> $roles
+     * @param Model|null $context
+     * @param string|null $collection
+     *
+     * @return void
+     */
+    public function syncRoles(array $roles, Model $context = null, ?string $collection = null): void
+    {
+        $desired = collect($roles)
+            ->map(fn ($role) => $role instanceof Role ? (int) $role->id : (int) $role)
+            ->unique()
+            ->values();
+
+        $existing = $this->validMemberships($context, $collection);
+
+        foreach ($existing as $membership) {
+            if (! $desired->contains((int) $membership->role_id)) {
+                MembershipFacade::destroy((int) $membership->id);
+            }
+        }
+
+        $existingRoleIds = $this->validMemberships($context, $collection)->pluck('role_id')->map(fn ($id) => (int) $id);
+
+        foreach ($desired as $roleId) {
+            if ($existingRoleIds->contains($roleId)) {
+                continue;
+            }
+
+            $this->assignRole($roleId, $context, [
+                'collection' => $collection,
+            ]);
+        }
     }
 
     /**
@@ -69,18 +227,46 @@ trait HasRole
     }
 
     /**
+     * Whether the person owns the given memberable context.
+     *
+     * @param Model $context
+     * @param string|null $collection
+     *
+     * @return bool
+     */
+    protected function hasOwnerMembership(Model $context, ?string $collection = null): bool
+    {
+        $query = $this->memberships()
+            ->where('memberable_type', $context->getMorphClass())
+            ->where('memberable_id', $context->getKey())
+            ->where('is_owner', true)
+            ->where(function ($q) {
+                $q->whereNull('expired_at')->orWhere('expired_at', '>', now());
+            });
+
+        if ($collection !== null) {
+            $query->where('collection', $collection);
+        }
+
+        return $query->exists();
+    }
+
+    /**
      * Load non-expired memberships for system or a specific memberable context.
      *
      * @param Model|null $context
+     * @param string|null $collection
      *
      * @return Collection
      */
-    protected function validMemberships(Model $context = null): Collection
+    protected function validMemberships(Model $context = null, ?string $collection = null): Collection
     {
         return $this->memberships()->when($context, function ($query) use ($context) {
             $query->where('memberable_type', $context->getMorphClass())->where('memberable_id', $context->getKey());
         }, function ($query) {
             $query->whereNull('memberable_type')->whereNull('memberable_id');
+        })->when($collection !== null, function ($query) use ($collection) {
+            $query->where('collection', $collection);
         })->where(function ($q) {
             $q->whereNull('expired_at')->orWhere('expired_at', '>', now());
         })->get();
@@ -172,13 +358,13 @@ trait HasRole
         }
 
         return [
-            'allow' => array_unique($allow),
-            'deny'  => array_unique($deny),
+            'allow' => array_values(array_unique($allow)),
+            'deny'  => array_values(array_unique($deny)),
         ];
     }
 
     /**
-     * Evaluate allow/deny lists for a single permission.
+     * Evaluate allow/deny lists for a single permission (supports trailing wildcards).
      *
      * @param array{allow: array, deny: array} $permissions
      * @param string $permission
@@ -187,12 +373,35 @@ trait HasRole
      */
     protected function evaluatePermissions(array $permissions, string $permission): bool
     {
-        if (in_array($permission, $permissions['deny'], true)) {
+        if ($this->permissionMatchesList($permission, $permissions['deny'])) {
             return false;
         }
 
-        if (in_array($permission, $permissions['allow'], true)) {
-            return true;
+        return $this->permissionMatchesList($permission, $permissions['allow']);
+    }
+
+    /**
+     * Whether a permission matches any entry (exact or foo.* wildcard).
+     *
+     * @param string $permission
+     * @param array<int, string> $list
+     *
+     * @return bool
+     */
+    protected function permissionMatchesList(string $permission, array $list): bool
+    {
+        foreach ($list as $entry) {
+            if ($entry === '*' || $entry === $permission) {
+                return true;
+            }
+
+            if (str_ends_with($entry, '.*')) {
+                $prefix = substr($entry, 0, -1);
+
+                if (str_starts_with($permission, $prefix)) {
+                    return true;
+                }
+            }
         }
 
         return false;

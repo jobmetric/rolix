@@ -3,6 +3,7 @@
 namespace JobMetric\Rolix\Tests\Stubs;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 use JobMetric\Rolix\Traits\HasRole;
 
 /**
@@ -10,7 +11,7 @@ use JobMetric\Rolix\Traits\HasRole;
  *
  * @package JobMetric\Rolix\Tests
  */
-class Person extends Model
+class Person extends Authenticatable
 {
     use HasRole;
 

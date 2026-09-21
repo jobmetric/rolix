@@ -36,6 +36,7 @@ use JobMetric\Rolix\Factories\RoleFactory;
  * @property-read RoleRule[] $rules
  *
  * @method static Builder|Role ofType(string $type)
+ * @method static Builder|Role inSubtree(int $rootId)
  * @method static find(int $int)
  * @method static findOrFail(int $id)
  * @method static create(array $array)
@@ -174,6 +175,29 @@ class Role extends Model
     }
 
     /**
+     * Descendant roles (roles that have this role as an ancestor).
+     *
+     * @return Collection<int, Role>
+     */
+    public function descendants(): Collection
+    {
+        $roleIds = RolePath::query()
+            ->where('path_id', $this->id)
+            ->where('level', '>', 0)
+            ->orderBy('level')
+            ->pluck('role_id');
+
+        if ($roleIds->isEmpty()) {
+            return collect();
+        }
+
+        /** @var EloquentCollection<int, Role> $roles */
+        $roles = self::query()->whereIn('id', $roleIds)->get()->keyBy('id');
+
+        return $roleIds->map(fn ($id) => $roles->get($id))->filter()->values();
+    }
+
+    /**
      * Scope a query to only include roles of a given type.
      *
      * @param Builder $query
@@ -184,5 +208,18 @@ class Role extends Model
     public function scopeOfType(Builder $query, string $type): Builder
     {
         return $query->where('type', $type);
+    }
+
+    /**
+     * Roles in the subtree of $rootId (including the root itself).
+     *
+     * @param Builder $query
+     * @param int $rootId
+     *
+     * @return Builder
+     */
+    public function scopeInSubtree(Builder $query, int $rootId): Builder
+    {
+        return $query->whereIn('id', RolePath::query()->where('path_id', $rootId)->select('role_id'));
     }
 }

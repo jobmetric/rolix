@@ -2,6 +2,10 @@
 
 namespace JobMetric\Rolix;
 
+use Illuminate\Contracts\Container\BindingResolutionException;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Facades\Gate;
 use JobMetric\PackageCore\Enums\RegisterClassTypeEnum;
 use JobMetric\PackageCore\Exceptions\MigrationFolderNotFoundException;
 use JobMetric\PackageCore\Exceptions\RegisterClassTypeNotFoundException;
@@ -11,6 +15,7 @@ use JobMetric\Rolix\Events\RegisterPathPermissionEvent;
 use JobMetric\Rolix\Facades\Permission;
 use JobMetric\Rolix\Facades\RoleTypeRegistry as FacadeRoleTypeRegistry;
 use JobMetric\Rolix\Facades\RuleEvaluatorRegistry as FacadeRuleEvaluatorRegistry;
+use JobMetric\Rolix\Http\Middleware\EnsurePermission;
 use JobMetric\Rolix\RuleEvaluators\CustomExpressionEvaluator;
 use JobMetric\Rolix\RuleEvaluators\EnvEvaluator;
 use JobMetric\Rolix\RuleEvaluators\IpRangeEvaluator;
@@ -20,6 +25,7 @@ use JobMetric\Rolix\RuleEvaluators\RoleCountEvaluator;
 use JobMetric\Rolix\RuleEvaluators\TimeEvaluator;
 use JobMetric\Rolix\RuleEvaluators\UserStatusEvaluator;
 use JobMetric\Rolix\RuleEvaluators\WeekdayEvaluator;
+use JobMetric\Rolix\Services\Membership;
 use JobMetric\Rolix\Services\PermissionManager;
 use JobMetric\Rolix\Services\Role;
 use JobMetric\Rolix\Support\RoleTypeRegistry;
@@ -42,6 +48,7 @@ class RolixServiceProvider extends PackageCoreServiceProvider
             ->hasTranslation()
             ->registerClass('rolix.permission', PermissionManager::class, RegisterClassTypeEnum::SINGLETON())
             ->registerClass('role', Role::class, RegisterClassTypeEnum::SINGLETON())
+            ->registerClass('membership', Membership::class, RegisterClassTypeEnum::SINGLETON())
             ->registerClass('RoleTypeRegistry', RoleTypeRegistry::class, RegisterClassTypeEnum::SINGLETON())
             ->registerClass('RuleEvaluatorRegistry', RuleEvaluatorRegistry::class, RegisterClassTypeEnum::SINGLETON());
     }
@@ -78,9 +85,45 @@ class RolixServiceProvider extends PackageCoreServiceProvider
      * after boot package
      *
      * @return void
+     * @throws BindingResolutionException
      */
     public function afterBootPackage(): void
     {
+        // Register middleware alias for permission checking
+        $this->app->make('router')->aliasMiddleware('rolix.permission', EnsurePermission::class);
+
+        // Register a global before callback for all authorization checks
+        Gate::before(function ($user, string $ability, array $arguments = []) {
+            if ($user === null || ! is_object($user) || ! method_exists($user, 'hasPermission')) {
+                return null;
+            }
+
+            $context = $arguments[0] ?? null;
+            $collection = $arguments[1] ?? null;
+
+            if ($context !== null && ! $context instanceof Model) {
+                $context = null;
+            }
+
+            if (! is_string($collection)) {
+                $collection = null;
+            }
+
+            return $user->hasPermission($ability, $context, $collection) ? true : null;
+        });
+
+        // Register a custom Blade directive for permission checking
+        Blade::if('rolixCan', function (string $permission, $context = null, $collection = null) {
+            $user = auth()->user();
+
+            if ($user === null || ! method_exists($user, 'hasPermission')) {
+                return false;
+            }
+
+            return (bool) $user->hasPermission($permission, $context instanceof Model ? $context : null, is_string($collection) ? $collection : null);
+        });
+
+        // Load global permission files after the application has booted
         app()->booted(function () {
             $global_permission_path = config_path('permissions');
 

@@ -6,9 +6,9 @@ use Exception;
 use Throwable;
 
 /**
- * Thrown when a super role cannot be deleted or demoted.
+ * Thrown when a membership violates the unique membership constraint.
  */
-class RoleIsSuperException extends Exception
+class MembershipDuplicateException extends Exception
 {
     /**
      * @param string $action Translation key suffix under exceptions.
@@ -16,8 +16,8 @@ class RoleIsSuperException extends Exception
      * @param Throwable|null $previous
      */
     public function __construct(
-        string $action = 'role_is_super_protected',
-        int $code = 400,
+        string $action = 'membership_already_exists',
+        int $code = 422,
         ?Throwable $previous = null
     ) {
         parent::__construct(trans('rolix::base.exceptions.' . $action), $code, $previous);

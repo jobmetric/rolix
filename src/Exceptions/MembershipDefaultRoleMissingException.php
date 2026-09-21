@@ -6,9 +6,9 @@ use Exception;
 use Throwable;
 
 /**
- * Thrown when a super role cannot be deleted or demoted.
+ * Thrown when no default role exists for the resolved membership role type.
  */
-class RoleIsSuperException extends Exception
+class MembershipDefaultRoleMissingException extends Exception
 {
     /**
      * @param string $action Translation key suffix under exceptions.
@@ -16,8 +16,8 @@ class RoleIsSuperException extends Exception
      * @param Throwable|null $previous
      */
     public function __construct(
-        string $action = 'role_is_super_protected',
-        int $code = 400,
+        string $action = 'membership_default_role_missing',
+        int $code = 422,
         ?Throwable $previous = null
     ) {
         parent::__construct(trans('rolix::base.exceptions.' . $action), $code, $previous);

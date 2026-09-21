@@ -70,18 +70,18 @@ class RoleActivityLog extends Model
      * @var array<string, string>
      */
     protected $casts = [
-        'action' => 'integer',
-        'actor_type' => 'string',
-        'actor_id' => 'integer',
-        'target_type' => 'string',
-        'target_id' => 'integer',
+        'action'       => 'string',
+        'actor_type'   => 'string',
+        'actor_id'     => 'integer',
+        'target_type'  => 'string',
+        'target_id'    => 'integer',
         'context_type' => 'string',
-        'context_id' => 'integer',
+        'context_id'   => 'integer',
         'subject_type' => 'string',
-        'subject_id' => 'integer',
-        'reason' => 'string',
-        'ip_address' => 'string',
-        'user_agent' => 'string',
+        'subject_id'   => 'integer',
+        'reason'       => 'string',
+        'ip_address'   => 'string',
+        'user_agent'   => 'string',
         'performed_at' => 'datetime',
     ];
 

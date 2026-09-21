@@ -2,35 +2,40 @@
 
 namespace JobMetric\Rolix\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\Pivot;
+use JobMetric\Rolix\Factories\RolePathFactory;
 
 /**
- * JobMetric\Rolix\Models\RolePath
+ * Closure-table row linking a role to an ancestor (or itself at level 0).
  *
- * @property int $type
+ * @property string $type
  * @property int $role_id
  * @property int $path_id
  * @property int $level
  *
- * @method static find(int $int)
- * @method static findOrFail(int $id)
- * @method static create(array $array)
+ * @property-read Role $role
+ * @property-read Role $path
  */
-class RolePath extends Pivot
+class RolePath extends Model
 {
     use HasFactory;
 
     /**
-     * Indicates if the IDs are auto-incrementing.
-     *
      * @var bool
      */
     public $incrementing = false;
 
+    /**
+     * @var bool
+     */
     public $timestamps = false;
 
+    /**
+     * @var array<int, string>
+     */
     protected $fillable = [
         'type',
         'role_id',
@@ -39,8 +44,6 @@ class RolePath extends Pivot
     ];
 
     /**
-     * The attributes that should be cast.
-     *
      * @var array<string, string>
      */
     protected $casts = [
@@ -50,14 +53,23 @@ class RolePath extends Pivot
         'level'   => 'integer',
     ];
 
-    public function getTable()
+    /**
+     * @return RolePathFactory
+     */
+    protected static function newFactory(): RolePathFactory
+    {
+        return RolePathFactory::new();
+    }
+
+    /**
+     * @return string
+     */
+    public function getTable(): string
     {
         return config('rolix.tables.role_path', parent::getTable());
     }
 
     /**
-     * role relation.
-     *
      * @return BelongsTo
      */
     public function role(): BelongsTo
@@ -66,12 +78,36 @@ class RolePath extends Pivot
     }
 
     /**
-     * path relation.
-     *
      * @return BelongsTo
      */
     public function path(): BelongsTo
     {
         return $this->belongsTo(Role::class, 'path_id');
+    }
+
+    /**
+     * Paths for a given role id.
+     *
+     * @param Builder $query
+     * @param int $roleId
+     *
+     * @return Builder
+     */
+    public function scopeForRole(Builder $query, int $roleId): Builder
+    {
+        return $query->where('role_id', $roleId);
+    }
+
+    /**
+     * Rows under a path root (subtree including the root at level 0).
+     *
+     * @param Builder $query
+     * @param int $pathId
+     *
+     * @return Builder
+     */
+    public function scopeUnderPath(Builder $query, int $pathId): Builder
+    {
+        return $query->where('path_id', $pathId);
     }
 }

@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use JobMetric\Rolix\Events\Resources\MemberableResourceEvent;
 use JobMetric\Rolix\Events\Resources\PersonableResourceEvent;
 use JobMetric\Rolix\Exceptions\MembershipMemberableMismatchException;
@@ -54,7 +55,7 @@ use JobMetric\Rolix\Factories\MembershipFactory;
  */
 class Membership extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
@@ -90,6 +91,7 @@ class Membership extends Model
         'expired_at'      => 'datetime',
         'allow'           => 'array',
         'deny'            => 'array',
+        'deleted_at'      => 'datetime',
     ];
 
     /**

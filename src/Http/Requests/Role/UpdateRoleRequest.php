@@ -115,6 +115,10 @@ class UpdateRoleRequest extends FormRequest
             }
 
             if (! empty($parentId)) {
+                if (RoleTypeRegistry::getOption($type, 'hierarchical', true) === false) {
+                    $v->errors()->add('parent_id', trans('rolix::base.validation.role.parent_not_allowed'));
+                }
+
                 $parent = Role::query()->find($parentId);
 
                 if ($parent !== null && $parent->type !== $type) {

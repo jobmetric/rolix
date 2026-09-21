@@ -4,6 +4,8 @@ namespace JobMetric\Rolix\Tests\Stubs;
 
 use Illuminate\Database\Eloquent\Model;
 
+use JobMetric\Rolix\Traits\HasMembers;
+
 /**
  * Stub memberable model for Rolix tests.
  *
@@ -11,6 +13,7 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Tenant extends Model
 {
+    use HasMembers;
     /**
      * @var string
      */

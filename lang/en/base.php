@@ -14,9 +14,18 @@ return [
 
     'entity_names' => [
         'role' => 'role',
+        'membership' => 'membership',
     ],
 
     'fields' => [
+        'personable_type' => 'personable type',
+        'personable_id' => 'personable',
+        'memberable_type' => 'memberable type',
+        'memberable_id' => 'memberable',
+        'role_id' => 'role',
+        'collection' => 'collection',
+        'is_owner' => 'owner',
+        'expired_at' => 'expiration',
         'type' => 'type',
         'parent_id' => 'parent',
         'name' => 'name',
@@ -37,6 +46,7 @@ return [
             'permission_not_registered' => 'The permission :permission is not registered for this role type.',
             'rule_driver_invalid' => 'The rule driver is invalid.',
             'is_super_already_exists' => 'Full administrator access is already defined for this role type.',
+            'parent_not_allowed' => 'This role type does not support hierarchy.',
         ],
     ],
 
@@ -47,6 +57,8 @@ return [
         'membership_system_requires_null_memberable' => 'System role membership requires memberable to be null.',
         'membership_model_requires_memberable' => 'This role type requires a filled memberable.',
         'membership_memberable_type_mismatch' => 'memberable_type does not match the model registered for this role type.',
+        'membership_already_exists' => 'A membership with the same person, memberable, role, and collection already exists.',
+        'membership_default_role_missing' => 'No default role is configured for this membership type.',
         'role_is_super_protected' => 'A role with full administrator access cannot be deleted.',
         'role_is_super_cannot_demote' => 'Full administrator access cannot be removed from a role.',
         'role_is_super_already_exists' => 'Full administrator access is already defined for this role type.',
@@ -55,6 +67,7 @@ return [
         'role_hierarchy_parent_missing' => 'The parent role was not found.',
         'role_hierarchy_type_mismatch' => 'The parent role must belong to the same type.',
         'role_hierarchy_cycle' => 'The selected parent would create a hierarchy cycle.',
+        'role_hierarchy_not_allowed' => 'This role type does not support hierarchy.',
     ],
 
     'types' => [

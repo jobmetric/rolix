@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Carbon;
 use JobMetric\Rolix\Models\Role;
+use JobMetric\Rolix\Models\RolePath;
 use JobMetric\Rolix\Models\RoleRule;
 
 /**
@@ -26,6 +27,7 @@ use JobMetric\Rolix\Models\RoleRule;
  *
  * @property-read Role|null $parent
  * @property-read Role[] $children
+ * @property-read RolePath[] $paths
  * @property-read RoleRule[] $rules
  */
 class RoleResource extends JsonResource
@@ -60,6 +62,25 @@ class RoleResource extends JsonResource
             }),
             'rules'       => $this->whenLoaded('rules', function () {
                 return RoleRuleResource::collection($this->rules);
+            }),
+            'paths'       => $this->whenLoaded('paths', function () {
+                return RolePathResource::collection($this->paths);
+            }),
+            'ancestors'   => $this->whenLoaded('paths', function () {
+                return $this->paths->where('level', '>', 0)->sortBy('level')->values()->map(function (RolePath $path) {
+                    $ancestor = $path->relationLoaded('path') ? $path->path : $path->path()->first();
+
+                    if ($ancestor === null) {
+                        return null;
+                    }
+
+                    return [
+                        'id'    => $ancestor->id,
+                        'name'  => $ancestor->name,
+                        'type'  => $ancestor->type,
+                        'level' => $path->level,
+                    ];
+                })->filter()->values();
             }),
         ];
     }

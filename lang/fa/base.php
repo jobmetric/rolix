@@ -14,9 +14,18 @@ return [
 
     'entity_names' => [
         'role' => 'نقش',
+        'membership' => 'عضویت',
     ],
 
     'fields' => [
+        'personable_type' => 'نوع شخص',
+        'personable_id' => 'شخص',
+        'memberable_type' => 'نوع عضوپذیر',
+        'memberable_id' => 'عضوپذیر',
+        'role_id' => 'نقش',
+        'collection' => 'مجموعه',
+        'is_owner' => 'مالک',
+        'expired_at' => 'انقضا',
         'type' => 'نوع',
         'parent_id' => 'والد',
         'name' => 'نام',
@@ -37,6 +46,7 @@ return [
             'permission_not_registered' => 'مجوز :permission برای این نوع نقش ثبت نشده است.',
             'rule_driver_invalid' => 'درایور قانون نامعتبر است.',
             'is_super_already_exists' => 'برای این نوع نقش، دسترسی مدیر کل از قبل تعریف شده است.',
+            'parent_not_allowed' => 'این نوع نقش از سلسله‌مراتب پشتیبانی نمی‌کند.',
         ],
     ],
 
@@ -47,6 +57,8 @@ return [
         'membership_system_requires_null_memberable' => 'عضویت نقش سیستمی باید memberable خالی داشته باشد.',
         'membership_model_requires_memberable' => 'این نوع نقش نیاز به memberable پر شده دارد.',
         'membership_memberable_type_mismatch' => 'نوع memberable با مدل ثبت‌شده برای این نوع نقش مطابقت ندارد.',
+        'membership_already_exists' => 'عضویتی با همان شخص، عضوپذیر، نقش و مجموعه از قبل وجود دارد.',
+        'membership_default_role_missing' => 'نقش پیش‌فرضی برای این نوع عضویت تنظیم نشده است.',
         'role_is_super_protected' => 'نقش با دسترسی مدیر کل قابل حذف نیست.',
         'role_is_super_cannot_demote' => 'دسترسی مدیر کل قابل حذف از نقش نیست.',
         'role_is_super_already_exists' => 'برای این نوع نقش، دسترسی مدیر کل از قبل تعریف شده است.',
@@ -55,6 +67,7 @@ return [
         'role_hierarchy_parent_missing' => 'نقش والد پیدا نشد.',
         'role_hierarchy_type_mismatch' => 'نقش والد باید از همان نوع باشد.',
         'role_hierarchy_cycle' => 'والد انتخاب‌شده باعث ایجاد حلقه سلسله‌مراتبی می‌شود.',
+        'role_hierarchy_not_allowed' => 'این نوع نقش از سلسله‌مراتب پشتیبانی نمی‌کند.',
     ],
 
     'types' => [
