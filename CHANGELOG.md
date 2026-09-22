@@ -2,6 +2,11 @@
 
 All notable changes to `jobmetric/rolix` are documented here.
 
+## 1.3.0 - 2026-09-22
+
+- Remove the user-status evaluator from the package.
+- Show current UTC offsets in timezone option labels.
+
 ## 1.2.1 - 2026-09-22
 
 - Remove the retired location, role-count, quota, and custom-expression evaluator classes and translations.

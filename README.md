@@ -37,7 +37,7 @@ Use Laravel Gate, the `rolix.permission` middleware, and `@rolixCan` Blade direc
 
 ### Rule Evaluators & Activity Log
 
-Attach focused runtime rules (time, weekday, user status, IP, and application environment) to roles, and keep an audit trail of role/membership mutations through the activity logger.
+Attach focused runtime rules (time, weekday, IP, and application environment) to roles, and keep an audit trail of role/membership mutations through the activity logger.
 
 ## What is Rolix?
 

@@ -2,6 +2,8 @@
 
 namespace JobMetric\Rolix\Contracts;
 
+use DateTimeImmutable;
+use DateTimeZone;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
@@ -114,6 +116,26 @@ abstract class AbstractRuleEvaluator implements RuleEvaluatorContract
 
         return array_values(array_filter(array_map('trim', preg_split('/[\s,;]+/', $value) ?: []), static fn ($item
         ) => $item !== ''));
+    }
+
+    /**
+     * Build timezone select options with their current UTC offsets.
+     *
+     * @return array<int, array{label: string, value: string}>
+     */
+    protected function timezoneOptions(): array
+    {
+        $now = new DateTimeImmutable;
+
+        return array_map(static function (string $name) use ($now): array {
+            $timezone = new DateTimeZone($name);
+            $seconds = $timezone->getOffset($now);
+            $sign = $seconds < 0 ? '-' : '+';
+            $minutes = (int) abs($seconds / 60);
+            $offset = sprintf('%s%02d:%02d', $sign, intdiv($minutes, 60), $minutes % 60);
+
+            return ['label' => "(UTC{$offset}) {$name}", 'value' => $name];
+        }, DateTimeZone::listIdentifiers());
     }
 
     /**

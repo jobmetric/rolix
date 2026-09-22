@@ -118,19 +118,6 @@ return [
                 'sunday' => 'Sunday',
             ],
         ],
-        'user_status' => [
-            'label' => 'User status',
-            'description' => 'Compares one user attribute with the expected value before activating the role.',
-            'attribute' => [
-                'label' => 'Attribute',
-                'info' => 'Personable attribute to compare (default: status).',
-            ],
-            'expected' => [
-                'label' => 'Required user status',
-                'info' => 'Choose whether this role applies to active or inactive users.',
-            ],
-            'options' => ['active' => 'Active', 'inactive' => 'Inactive'],
-        ],
         'ip_range' => [
             'label' => 'IP range',
             'description' => 'Restricts the role to exact IP addresses or CIDR network ranges.',

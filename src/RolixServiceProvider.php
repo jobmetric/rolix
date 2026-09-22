@@ -34,7 +34,6 @@ use JobMetric\Rolix\Http\Middleware\EnsurePermission;
 use JobMetric\Rolix\RuleEvaluators\EnvEvaluator;
 use JobMetric\Rolix\RuleEvaluators\IpRangeEvaluator;
 use JobMetric\Rolix\RuleEvaluators\TimeEvaluator;
-use JobMetric\Rolix\RuleEvaluators\UserStatusEvaluator;
 use JobMetric\Rolix\RuleEvaluators\WeekdayEvaluator;
 use JobMetric\Rolix\Services\Membership;
 use JobMetric\Rolix\Services\PermissionManager;
@@ -80,7 +79,6 @@ class RolixServiceProvider extends PackageCoreServiceProvider
             [
                 TimeEvaluator::class,
                 WeekdayEvaluator::class,
-                UserStatusEvaluator::class,
                 IpRangeEvaluator::class,
                 EnvEvaluator::class,
             ] as $evaluator) {

@@ -7,9 +7,7 @@ use Illuminate\Http\Request;
 use JobMetric\Rolix\RuleEvaluators\EnvEvaluator;
 use JobMetric\Rolix\RuleEvaluators\IpRangeEvaluator;
 use JobMetric\Rolix\RuleEvaluators\TimeEvaluator;
-use JobMetric\Rolix\RuleEvaluators\UserStatusEvaluator;
 use JobMetric\Rolix\RuleEvaluators\WeekdayEvaluator;
-use JobMetric\Rolix\Tests\Stubs\Person;
 use JobMetric\Rolix\Tests\TestCase;
 
 /**
@@ -34,7 +32,6 @@ class RuleEvaluatorsTest extends TestCase
         return [
             [TimeEvaluator::class],
             [WeekdayEvaluator::class],
-            [UserStatusEvaluator::class],
             [IpRangeEvaluator::class],
             [EnvEvaluator::class],
         ];
@@ -71,15 +68,6 @@ class RuleEvaluatorsTest extends TestCase
         $this->assertFalse($evaluator->evaluate(['days' => 'sunday', 'timezone' => 'UTC'], null));
 
         Carbon::setTestNow();
-    }
-
-    public function test_user_status_evaluator(): void
-    {
-        $person = Person::create(['name' => 'A', 'status' => true]);
-        $evaluator = new UserStatusEvaluator;
-
-        $this->assertTrue($evaluator->evaluate(['expected' => '1'], $person));
-        $this->assertFalse($evaluator->evaluate(['expected' => '0'], $person));
     }
 
     public function test_ip_range_evaluator(): void
