@@ -2,6 +2,11 @@
 
 All notable changes to `jobmetric/rolix` are documented here.
 
+## 1.2.1 - 2026-09-22
+
+- Remove the retired location, role-count, quota, and custom-expression evaluator classes and translations.
+- Cover array-based environment selection and the simplified user-status rule.
+
 ## 1.2.0 - 2026-09-22
 
 - Focus the built-in evaluator registry on time, weekday, user status, IP range, and environment rules.

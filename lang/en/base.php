@@ -139,18 +139,6 @@ return [
                 'info' => 'Enter exact addresses or CIDR networks separated by commas. Example: 192.168.1.10, 10.0.0.0/24',
             ],
         ],
-        'location' => [
-            'label' => 'Location',
-            'description' => 'Restricts the role by ISO country codes and optional city names supplied by the request context.',
-            'countries' => [
-                'label' => 'Countries',
-                'info' => 'Comma-separated ISO country codes.',
-            ],
-            'cities' => [
-                'label' => 'Cities',
-                'info' => 'Comma-separated city names.',
-            ],
-        ],
         'env' => [
             'label' => 'Application environment',
             'description' => 'Activates the role only in named application environments such as production or staging.',
@@ -159,45 +147,6 @@ return [
                 'info' => 'Select every application environment in which this role may be active.',
             ],
             'options' => ['local' => 'Local', 'development' => 'Development', 'testing' => 'Testing', 'staging' => 'Staging', 'production' => 'Production'],
-        ],
-        'role_count' => [
-            'label' => 'Role count',
-            'description' => 'Checks whether the user active-role count is within the optional minimum and maximum limits.',
-            'type' => [
-                'label' => 'Role type',
-                'info' => 'Optional role type filter for membership count.',
-            ],
-            'min' => [
-                'label' => 'Minimum',
-            ],
-            'max' => [
-                'label' => 'Maximum',
-            ],
-        ],
-        'quota' => [
-            'label' => 'Membership quota',
-            'description' => 'Limits activation according to the number of active memberships in a collection.',
-            'key' => [
-                'label' => 'Quota key',
-                'info' => 'Membership collection key used for quota counting.',
-            ],
-            'limit' => [
-                'label' => 'Limit',
-            ],
-        ],
-        'custom_expression' => [
-            'label' => 'Custom condition',
-            'description' => 'Safely compares an allowed context or request value without executing arbitrary code.',
-            'left_key' => [
-                'label' => 'Left key',
-                'info' => 'Safe context or request key (e.g. status, request.ip).',
-            ],
-            'operator' => [
-                'label' => 'Operator',
-            ],
-            'right_value' => [
-                'label' => 'Right value',
-            ],
         ],
     ],
 
