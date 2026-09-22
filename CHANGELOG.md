@@ -2,6 +2,10 @@
 
 All notable changes to `jobmetric/rolix` are documented here.
 
+## 1.1.3 - 2026-09-22
+
+- Add localized usage descriptions for every built-in role-rule evaluator.
+
 ## 1.1.2 - 2026-09-22
 
 - Add localized display names for every built-in role-rule evaluator.

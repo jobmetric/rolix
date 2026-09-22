@@ -83,6 +83,7 @@ return [
         ],
         'time' => [
             'label' => 'Time range',
+            'description' => 'Activates the role only during the configured daily time range. Overnight ranges are supported.',
             'from' => [
                 'label' => 'From',
                 'info' => 'Start of the allowed time range (HH:MM).',
@@ -98,6 +99,7 @@ return [
         ],
         'weekday' => [
             'label' => 'Weekdays',
+            'description' => 'Activates the role only on the selected weekdays in the chosen timezone.',
             'days' => [
                 'label' => 'Days',
                 'info' => 'Allowed weekdays.',
@@ -117,6 +119,7 @@ return [
         ],
         'user_status' => [
             'label' => 'User status',
+            'description' => 'Compares one user attribute with the expected value before activating the role.',
             'attribute' => [
                 'label' => 'Attribute',
                 'info' => 'Personable attribute to compare (default: status).',
@@ -128,6 +131,7 @@ return [
         ],
         'ip_range' => [
             'label' => 'IP range',
+            'description' => 'Restricts the role to exact IP addresses or CIDR network ranges.',
             'ranges' => [
                 'label' => 'IP ranges',
                 'info' => 'Comma-separated IPs or CIDR ranges.',
@@ -135,6 +139,7 @@ return [
         ],
         'location' => [
             'label' => 'Location',
+            'description' => 'Restricts the role by ISO country codes and optional city names supplied by the request context.',
             'countries' => [
                 'label' => 'Countries',
                 'info' => 'Comma-separated ISO country codes.',
@@ -146,6 +151,7 @@ return [
         ],
         'env' => [
             'label' => 'Application environment',
+            'description' => 'Activates the role only in named application environments such as production or staging.',
             'environments' => [
                 'label' => 'Environments',
                 'info' => 'Comma-separated environment names (e.g. production, staging).',
@@ -153,6 +159,7 @@ return [
         ],
         'role_count' => [
             'label' => 'Role count',
+            'description' => 'Checks whether the user active-role count is within the optional minimum and maximum limits.',
             'type' => [
                 'label' => 'Role type',
                 'info' => 'Optional role type filter for membership count.',
@@ -166,6 +173,7 @@ return [
         ],
         'quota' => [
             'label' => 'Membership quota',
+            'description' => 'Limits activation according to the number of active memberships in a collection.',
             'key' => [
                 'label' => 'Quota key',
                 'info' => 'Membership collection key used for quota counting.',
@@ -176,6 +184,7 @@ return [
         ],
         'custom_expression' => [
             'label' => 'Custom condition',
+            'description' => 'Safely compares an allowed context or request value without executing arbitrary code.',
             'left_key' => [
                 'label' => 'Left key',
                 'info' => 'Safe context or request key (e.g. status, request.ip).',
