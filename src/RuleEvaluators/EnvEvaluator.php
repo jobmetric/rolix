@@ -42,11 +42,19 @@ class EnvEvaluator extends AbstractRuleEvaluator
     {
         return $this->settingsForm(function ($tab) {
             $tab->customField(function (CustomFieldBuilder $field) {
-                $field::text()
+                $field::select()
                     ->name('environments')
                     ->label('rolix::base.rule_evaluators.env.environments.label')
                     ->info('rolix::base.rule_evaluators.env.environments.info')
-                    ->validation('required|string');
+                    ->validation('required')
+                    ->multiple()
+                    ->options([
+                        ['label' => 'rolix::base.rule_evaluators.env.options.local', 'value' => 'local'],
+                        ['label' => 'rolix::base.rule_evaluators.env.options.development', 'value' => 'development'],
+                        ['label' => 'rolix::base.rule_evaluators.env.options.testing', 'value' => 'testing'],
+                        ['label' => 'rolix::base.rule_evaluators.env.options.staging', 'value' => 'staging'],
+                        ['label' => 'rolix::base.rule_evaluators.env.options.production', 'value' => 'production'],
+                    ]);
             });
         });
     }

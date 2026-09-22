@@ -31,12 +31,8 @@ use JobMetric\Rolix\Facades\Permission;
 use JobMetric\Rolix\Facades\RoleTypeRegistry as FacadeRoleTypeRegistry;
 use JobMetric\Rolix\Facades\RuleEvaluatorRegistry as FacadeRuleEvaluatorRegistry;
 use JobMetric\Rolix\Http\Middleware\EnsurePermission;
-use JobMetric\Rolix\RuleEvaluators\CustomExpressionEvaluator;
 use JobMetric\Rolix\RuleEvaluators\EnvEvaluator;
 use JobMetric\Rolix\RuleEvaluators\IpRangeEvaluator;
-use JobMetric\Rolix\RuleEvaluators\LocationEvaluator;
-use JobMetric\Rolix\RuleEvaluators\QuotaEvaluator;
-use JobMetric\Rolix\RuleEvaluators\RoleCountEvaluator;
 use JobMetric\Rolix\RuleEvaluators\TimeEvaluator;
 use JobMetric\Rolix\RuleEvaluators\UserStatusEvaluator;
 use JobMetric\Rolix\RuleEvaluators\WeekdayEvaluator;
@@ -86,11 +82,7 @@ class RolixServiceProvider extends PackageCoreServiceProvider
                 WeekdayEvaluator::class,
                 UserStatusEvaluator::class,
                 IpRangeEvaluator::class,
-                LocationEvaluator::class,
                 EnvEvaluator::class,
-                RoleCountEvaluator::class,
-                QuotaEvaluator::class,
-                CustomExpressionEvaluator::class,
             ] as $evaluator) {
             FacadeRuleEvaluatorRegistry::register($evaluator);
         }

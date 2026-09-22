@@ -2,6 +2,12 @@
 
 All notable changes to `jobmetric/rolix` are documented here.
 
+## 1.2.0 - 2026-09-22
+
+- Focus the built-in evaluator registry on time, weekday, user status, IP range, and environment rules.
+- Replace free-form timezone, user-status, and environment settings with translated selections.
+- Expand IP range and environment guidance with actionable examples.
+
 ## 1.1.3 - 2026-09-22
 
 - Add localized usage descriptions for every built-in role-rule evaluator.

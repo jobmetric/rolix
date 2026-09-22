@@ -3,6 +3,7 @@
 namespace JobMetric\Rolix\RuleEvaluators;
 
 use Carbon\Carbon;
+use DateTimeZone;
 use JobMetric\CustomField\CustomFieldBuilder;
 use JobMetric\Form\FormBuilder;
 use JobMetric\Rolix\Contracts\AbstractRuleEvaluator;
@@ -83,10 +84,12 @@ class WeekdayEvaluator extends AbstractRuleEvaluator
                         ],
                     ]);
             })->customField(function (CustomFieldBuilder $field) {
-                $field::text()
+                $field::select()
                     ->name('timezone')
                     ->label('rolix::base.rule_evaluators.weekday.timezone.label')
-                    ->validation('nullable|string|timezone');
+                    ->info('rolix::base.rule_evaluators.weekday.timezone.info')
+                    ->validation('nullable|string|timezone')
+                    ->options(array_map(static fn (string $timezone) => ['label' => $timezone, 'value' => $timezone], DateTimeZone::listIdentifiers()));
             });
         });
     }

@@ -94,7 +94,7 @@ return [
             ],
             'timezone' => [
                 'label' => 'Timezone',
-                'info' => 'IANA timezone used for evaluation (defaults to app timezone).',
+                'info' => 'Choose the timezone whose local clock controls this rule. Leave empty to use the application timezone.',
             ],
         ],
         'weekday' => [
@@ -106,6 +106,7 @@ return [
             ],
             'timezone' => [
                 'label' => 'Timezone',
+                'info' => 'Choose the timezone used to determine the current weekday. Leave empty to use the application timezone.',
             ],
             'options' => [
                 'monday' => 'Monday',
@@ -125,16 +126,17 @@ return [
                 'info' => 'Personable attribute to compare (default: status).',
             ],
             'expected' => [
-                'label' => 'Expected value',
-                'info' => 'Value that must match the attribute.',
+                'label' => 'Required user status',
+                'info' => 'Choose whether this role applies to active or inactive users.',
             ],
+            'options' => ['active' => 'Active', 'inactive' => 'Inactive'],
         ],
         'ip_range' => [
             'label' => 'IP range',
             'description' => 'Restricts the role to exact IP addresses or CIDR network ranges.',
             'ranges' => [
                 'label' => 'IP ranges',
-                'info' => 'Comma-separated IPs or CIDR ranges.',
+                'info' => 'Enter exact addresses or CIDR networks separated by commas. Example: 192.168.1.10, 10.0.0.0/24',
             ],
         ],
         'location' => [
@@ -154,8 +156,9 @@ return [
             'description' => 'Activates the role only in named application environments such as production or staging.',
             'environments' => [
                 'label' => 'Environments',
-                'info' => 'Comma-separated environment names (e.g. production, staging).',
+                'info' => 'Select every application environment in which this role may be active.',
             ],
+            'options' => ['local' => 'Local', 'development' => 'Development', 'testing' => 'Testing', 'staging' => 'Staging', 'production' => 'Production'],
         ],
         'role_count' => [
             'label' => 'Role count',

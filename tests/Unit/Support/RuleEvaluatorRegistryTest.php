@@ -20,12 +20,8 @@ class RuleEvaluatorRegistryTest extends TestCase
         $this->assertContains('weekday', $names);
         $this->assertContains('user_status', $names);
         $this->assertContains('ip_range', $names);
-        $this->assertContains('location', $names);
         $this->assertContains('env', $names);
-        $this->assertContains('role_count', $names);
-        $this->assertContains('quota', $names);
-        $this->assertContains('custom_expression', $names);
-        $this->assertCount(9, $names);
+        $this->assertCount(5, $names);
     }
 
     public function test_resolve_by_name_and_fqcn(): void

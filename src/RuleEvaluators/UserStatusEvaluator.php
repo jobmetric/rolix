@@ -49,17 +49,15 @@ class UserStatusEvaluator extends AbstractRuleEvaluator
     {
         return $this->settingsForm(function ($tab) {
             $tab->customField(function (CustomFieldBuilder $field) {
-                $field::text()
-                    ->name('attribute')
-                    ->label('rolix::base.rule_evaluators.user_status.attribute.label')
-                    ->info('rolix::base.rule_evaluators.user_status.attribute.info')
-                    ->validation('nullable|string|max:255');
-            })->customField(function (CustomFieldBuilder $field) {
-                $field::text()
+                $field::select()
                     ->name('expected')
                     ->label('rolix::base.rule_evaluators.user_status.expected.label')
                     ->info('rolix::base.rule_evaluators.user_status.expected.info')
-                    ->validation('required|string|max:255');
+                    ->validation('required|string|max:255')
+                    ->options([
+                        ['label' => 'rolix::base.rule_evaluators.user_status.options.active', 'value' => '1'],
+                        ['label' => 'rolix::base.rule_evaluators.user_status.options.inactive', 'value' => '0'],
+                    ]);
             });
         });
     }
