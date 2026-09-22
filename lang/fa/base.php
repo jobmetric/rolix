@@ -82,6 +82,7 @@ return [
             'settings_tab' => 'تنظیمات',
         ],
         'time' => [
+            'label' => 'بازه زمانی',
             'from' => [
                 'label' => 'از ساعت',
                 'info' => 'شروع بازه زمانی مجاز (HH:MM).',
@@ -96,6 +97,7 @@ return [
             ],
         ],
         'weekday' => [
+            'label' => 'روزهای هفته',
             'days' => [
                 'label' => 'روزهای هفته',
                 'info' => 'روزهای مجاز هفته.',
@@ -114,6 +116,7 @@ return [
             ],
         ],
         'user_status' => [
+            'label' => 'وضعیت کاربر',
             'attribute' => [
                 'label' => 'ویژگی',
                 'info' => 'ویژگی شخص برای مقایسه (پیش‌فرض: status).',
@@ -124,12 +127,14 @@ return [
             ],
         ],
         'ip_range' => [
+            'label' => 'بازه IP',
             'ranges' => [
                 'label' => 'بازه IP',
                 'info' => 'آدرس‌های IP یا CIDR جداشده با کاما.',
             ],
         ],
         'location' => [
+            'label' => 'موقعیت مکانی',
             'countries' => [
                 'label' => 'کشورها',
                 'info' => 'کدهای ISO کشور جداشده با کاما.',
@@ -140,12 +145,14 @@ return [
             ],
         ],
         'env' => [
+            'label' => 'محیط برنامه',
             'environments' => [
                 'label' => 'محیط‌ها',
                 'info' => 'نام محیط‌ها جداشده با کاما (مثل production و staging).',
             ],
         ],
         'role_count' => [
+            'label' => 'تعداد نقش‌ها',
             'type' => [
                 'label' => 'نوع نقش',
                 'info' => 'فیلتر اختیاری نوع نقش برای شمارش عضویت.',
@@ -158,6 +165,7 @@ return [
             ],
         ],
         'quota' => [
+            'label' => 'سهمیه عضویت',
             'key' => [
                 'label' => 'کلید سهمیه',
                 'info' => 'کلید collection عضویت برای شمارش سهمیه.',
@@ -167,6 +175,7 @@ return [
             ],
         ],
         'custom_expression' => [
+            'label' => 'شرط سفارشی',
             'left_key' => [
                 'label' => 'کلید چپ',
                 'info' => 'کلید امن از context یا request (مثل status یا request.ip).',

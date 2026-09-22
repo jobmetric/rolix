@@ -82,6 +82,7 @@ return [
             'settings_tab' => 'Settings',
         ],
         'time' => [
+            'label' => 'Time range',
             'from' => [
                 'label' => 'From',
                 'info' => 'Start of the allowed time range (HH:MM).',
@@ -96,6 +97,7 @@ return [
             ],
         ],
         'weekday' => [
+            'label' => 'Weekdays',
             'days' => [
                 'label' => 'Days',
                 'info' => 'Allowed weekdays.',
@@ -114,6 +116,7 @@ return [
             ],
         ],
         'user_status' => [
+            'label' => 'User status',
             'attribute' => [
                 'label' => 'Attribute',
                 'info' => 'Personable attribute to compare (default: status).',
@@ -124,12 +127,14 @@ return [
             ],
         ],
         'ip_range' => [
+            'label' => 'IP range',
             'ranges' => [
                 'label' => 'IP ranges',
                 'info' => 'Comma-separated IPs or CIDR ranges.',
             ],
         ],
         'location' => [
+            'label' => 'Location',
             'countries' => [
                 'label' => 'Countries',
                 'info' => 'Comma-separated ISO country codes.',
@@ -140,12 +145,14 @@ return [
             ],
         ],
         'env' => [
+            'label' => 'Application environment',
             'environments' => [
                 'label' => 'Environments',
                 'info' => 'Comma-separated environment names (e.g. production, staging).',
             ],
         ],
         'role_count' => [
+            'label' => 'Role count',
             'type' => [
                 'label' => 'Role type',
                 'info' => 'Optional role type filter for membership count.',
@@ -158,6 +165,7 @@ return [
             ],
         ],
         'quota' => [
+            'label' => 'Membership quota',
             'key' => [
                 'label' => 'Quota key',
                 'info' => 'Membership collection key used for quota counting.',
@@ -167,6 +175,7 @@ return [
             ],
         ],
         'custom_expression' => [
+            'label' => 'Custom condition',
             'left_key' => [
                 'label' => 'Left key',
                 'info' => 'Safe context or request key (e.g. status, request.ip).',
