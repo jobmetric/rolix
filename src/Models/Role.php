@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Collection;
 use JobMetric\Rolix\Factories\RoleFactory;
+use JobMetric\Rolix\Support\PermissionCache;
 
 /**
  * Represents a role with optional hierarchy, permissions, and conditional rules.
@@ -44,6 +45,15 @@ use JobMetric\Rolix\Factories\RoleFactory;
 class Role extends Model
 {
     use HasFactory;
+
+    /**
+     * Invalidate permission snapshots whenever role data changes.
+     */
+    protected static function booted(): void
+    {
+        static::saved(static fn (): mixed => PermissionCache::bumpRoles());
+        static::deleted(static fn (): mixed => PermissionCache::bumpRoles());
+    }
 
     /**
      * The attributes that are mass assignable.

@@ -5,7 +5,7 @@ namespace JobMetric\Rolix\Tests\Unit\Traits;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Cache;
 use JobMetric\Rolix\Models\Role;
-use JobMetric\Rolix\Support\PermissionCache;
+use JobMetric\Rolix\Models\Membership;
 use JobMetric\Rolix\Tests\Stubs\Person;
 use JobMetric\Rolix\Tests\TestCase;
 
@@ -41,11 +41,48 @@ class HasRoleCacheAndBladeTest extends TestCase
 
         $role->allow = ['other'];
         $role->save();
-        PermissionCache::bumpRoles();
 
         $fresh = $person->fresh();
         $this->assertFalse($fresh->hasPermission('hero'));
         $this->assertTrue($fresh->hasPermission('other'));
+    }
+
+    public function test_shared_cache_invalidates_after_direct_membership_creation(): void
+    {
+        config(['rolix.cache.enabled' => true, 'rolix.cache.ttl' => 60]);
+        Cache::flush();
+
+        $person = Person::create(['name' => 'P']);
+        $role = Role::factory()->setType('system')->setAllow(['hero'])->create();
+
+        $this->assertFalse($person->hasPermission('hero'));
+
+        Membership::factory()
+            ->setPersonable(Person::class, $person->id)
+            ->system()
+            ->setRoleId($role->id)
+            ->create();
+
+        $this->assertTrue($person->fresh()->hasPermission('hero'));
+    }
+
+    public function test_shared_cache_invalidates_after_direct_role_rule_creation(): void
+    {
+        config(['rolix.cache.enabled' => true, 'rolix.cache.ttl' => 60]);
+        Cache::flush();
+
+        $person = Person::create(['name' => 'P']);
+        $role = Role::factory()->setType('system')->setAllow(['hero'])->create();
+        $person->assignRole($role);
+
+        $this->assertTrue($person->hasPermission('hero'));
+
+        $role->rules()->create([
+            'driver' => 'env',
+            'payload' => ['environments' => 'production'],
+        ]);
+
+        $this->assertFalse($person->fresh()->hasPermission('hero'));
     }
 
     public function test_blade_rolix_can_directive(): void

@@ -6,15 +6,15 @@ use JobMetric\EventSystem\Contracts\DomainEvent;
 use JobMetric\EventSystem\Support\DomainEventDefinition;
 use JobMetric\Rolix\Models\Role;
 
-readonly class RoleUpdateEvent implements DomainEvent
+class RoleUpdateEvent implements DomainEvent
 {
     /**
      * @param Role $role
      * @param array<string, mixed> $data
      */
     public function __construct(
-        public Role $role,
-        public array $data = []
+        public readonly Role $role,
+        public readonly array $data = []
     ) {
     }
 

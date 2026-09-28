@@ -6,13 +6,13 @@ use JobMetric\EventSystem\Contracts\DomainEvent;
 use JobMetric\EventSystem\Support\DomainEventDefinition;
 use JobMetric\Rolix\Models\Role;
 
-readonly class RoleDeleteEvent implements DomainEvent
+class RoleDeleteEvent implements DomainEvent
 {
     /**
      * @param Role $role
      */
     public function __construct(
-        public Role $role
+        public readonly Role $role
     ) {
     }
 

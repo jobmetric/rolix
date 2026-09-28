@@ -44,6 +44,7 @@ abstract class TestCase extends BaseTestCase
             'database' => ':memory:',
             'prefix'   => '',
         ]);
+        $app['config']->set('rolix.cache.enabled', false);
 
         $app->booting(function () use ($app): void {
             $migrationsPath = dirname(__DIR__) . DIRECTORY_SEPARATOR . 'database' . DIRECTORY_SEPARATOR . 'migrations';

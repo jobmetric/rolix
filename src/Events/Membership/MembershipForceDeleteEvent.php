@@ -6,13 +6,13 @@ use JobMetric\EventSystem\Contracts\DomainEvent;
 use JobMetric\EventSystem\Support\DomainEventDefinition;
 use JobMetric\Rolix\Models\Membership;
 
-readonly class MembershipForceDeleteEvent implements DomainEvent
+class MembershipForceDeleteEvent implements DomainEvent
 {
     /**
      * @param Membership $membership
      */
     public function __construct(
-        public Membership $membership
+        public readonly Membership $membership
     ) {
     }
 

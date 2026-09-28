@@ -57,7 +57,12 @@ class RolixServiceProviderTest extends TestCase
     {
         $this->assertInstanceOf(RuleEvaluatorRegistryService::class, $this->app->make('RuleEvaluatorRegistry'));
         $this->assertTrue(RuleEvaluatorRegistry::has('time'));
-        $this->assertCount(9, RuleEvaluatorRegistry::values());
+        $this->assertSame([
+            'time',
+            'weekday',
+            'ip_range',
+            'env',
+        ], RuleEvaluatorRegistry::values());
     }
 
     /**

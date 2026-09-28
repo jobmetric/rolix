@@ -15,6 +15,7 @@ use JobMetric\Rolix\Exceptions\MembershipMemberableMismatchException;
 use JobMetric\Rolix\Exceptions\RoleTypeNotFoundException;
 use JobMetric\Rolix\Facades\RoleTypeRegistry;
 use JobMetric\Rolix\Factories\MembershipFactory;
+use JobMetric\Rolix\Support\PermissionCache;
 
 /**
  * Represents a person's membership in a memberable entity or system-wide.
@@ -103,6 +104,25 @@ class Membership extends Model
     {
         static::saving(function (Membership $membership): void {
             $membership->assertMemberableMatchesRoleType();
+        });
+
+        static::saved(function (Membership $membership): void {
+            PermissionCache::forgetByMorph($membership->personable_type, $membership->personable_id);
+
+            if ($membership->wasChanged(['personable_type', 'personable_id'])) {
+                PermissionCache::forgetByMorph(
+                    $membership->getOriginal('personable_type'),
+                    $membership->getOriginal('personable_id')
+                );
+            }
+        });
+
+        static::deleted(function (Membership $membership): void {
+            PermissionCache::forgetByMorph($membership->personable_type, $membership->personable_id);
+        });
+
+        static::restored(function (Membership $membership): void {
+            PermissionCache::forgetByMorph($membership->personable_type, $membership->personable_id);
         });
     }
 

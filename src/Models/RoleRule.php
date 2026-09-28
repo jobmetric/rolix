@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use JobMetric\Rolix\Support\PermissionCache;
 
 /**
  * JobMetric\Rolix\Models\RoleRule
@@ -26,6 +27,15 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class RoleRule extends Model
 {
     use HasFactory;
+
+    /**
+     * Invalidate permission snapshots whenever a conditional rule changes.
+     */
+    protected static function booted(): void
+    {
+        static::saved(static fn (): mixed => PermissionCache::bumpRoles());
+        static::deleted(static fn (): mixed => PermissionCache::bumpRoles());
+    }
 
     protected $fillable = [
         'role_id',

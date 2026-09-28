@@ -6,15 +6,15 @@ use JobMetric\EventSystem\Contracts\DomainEvent;
 use JobMetric\EventSystem\Support\DomainEventDefinition;
 use JobMetric\Rolix\Models\Membership;
 
-readonly class MembershipStoreEvent implements DomainEvent
+class MembershipStoreEvent implements DomainEvent
 {
     /**
      * @param Membership $membership
      * @param array<string, mixed> $data
      */
     public function __construct(
-        public Membership $membership,
-        public array $data = []
+        public readonly Membership $membership,
+        public readonly array $data = []
     ) {
     }
 
